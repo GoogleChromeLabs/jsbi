@@ -66,7 +66,7 @@ Most operators are replaced by method calls:
 | Left shifting               | `c = a << b`   | `c = a.leftShift(b)`      |
 | Right shifting              | `c = a >> b`   | `c = signedRightShift(b)` |
 | Bitwise “and”               | `c = a & b`    | `c = a.bitwiseAnd(b)`     |
-| Bitwise “or”                | `c = a | b`    | `c = a.bitwiseOr(b)`      |
+| Bitwise “or”                | `c = a \| b`   | `c = a.bitwiseOr(b)`      |
 | Bitwise “xor”               | `c = a ^ b`    | `c = a.bitwiseXor(b)`     |
 | Comparison to other BigInts | `a === b`      | `a.equal(b)`              |
 |                             | `a < b`        | `a.lessThan(b)`           |
@@ -128,8 +128,8 @@ If you want, you can also instruct it to use the native BigInt implementation as
 Plans for the future include:
 
 - [issue #1](https://github.com/GoogleChromeLabs/jsbi/issues/1): introduce shorthands for operations (e.g. `exp` for `exponentiate`, and so on). The current method names follow the spec proposal. (If you have suggestions for naming schemes, please speak up!)
-- [issue #2](https://github.com/GoogleChromeLabs/jsbi/issues/2):create a tool to translate code using JSBI syntax to native BigInt syntax. (If you’d like to help, please speak up!)
-- [issue #3](https://github.com/GoogleChromeLabs/jsbi/issues/3):the current implementation has been tested quite well, but even more rigorous testing is always possible. (Should you find any bugs, please report them!)
+- [issue #2](https://github.com/GoogleChromeLabs/jsbi/issues/2): create a tool to translate code using JSBI syntax to native BigInt syntax. (If you’d like to help, please speak up!)
+- [issue #3](https://github.com/GoogleChromeLabs/jsbi/issues/3): the current implementation has been tested quite well, but even more rigorous testing is always possible. (Should you find any bugs, please report them!)
 - [issue #4](https://github.com/GoogleChromeLabs/jsbi/issues/4): investigate the feasibility of polyfilling `BigInt64Array`/`BigUint64Array` and the `DataView.{get,set}Big{Int,Uint}64` functions.
 
 A more vague plan is to use the JSBI library (or an extension to it) as a staging ground for additional BigInt-related functionality. The official proposal is intentionally somewhat minimal, and leaves further “library functions” for follow-up proposals. Examples are a combined `exp`+`mod` function, and bit manipulation functions.
