@@ -15,11 +15,15 @@ import JSBI from './jsbi.mjs';
 const JSBigInt = JSBI.BigInt;
 
 const max = JSBigInt(Number.MAX_SAFE_INTEGER);
-// → 9007199254740991
+console.log(String(max));
+// → '9007199254740991'
 const other = JSBigInt('2');
 const result = max.add(other);
-// → 9007199254740993
+console.log(String(result));
+// → '9007199254740993'
 ```
+
+Note: explicitly call `toString` on any `JSBI` instances when `console.log()`ing them to see their numeric representation (e.g. `String(max)` or `max.toString()`). Without it (e.g. `console.log(max)`), you’ll instead see the object that represents the value.
 
 Refer to the detailed instructions below for more information.
 
@@ -101,8 +105,8 @@ It is impossible to replicate the behavior of the native `++` and `--` operators
 let a = 100n;
 const b = a;
 a++;
-console.log(a); // 101
-console.log(b); // 100
+console.log(String(a)); // 101
+console.log(String(b)); // 100
 ```
 
 A BigInt library has two choices: an `a.increment()` method can either modify the object, or leave the object as it is and just return the incremented value. If it modifies the object, then the `console.log(a)` statement would print the same value as the native implementation, but the `console.log(b)` statement would not (it would also print the incremented value). If it leaves the object as-is, then `b` is correctly not mutated, but to see the effect on `a`, one has to write `a = a.increment()`. JSBI makes the latter choice. Thus, the complete equivalent JSBI code is:
@@ -111,8 +115,8 @@ A BigInt library has two choices: an `a.increment()` method can either modify th
 let a = JSBI.BigInt('100');
 const b = a;
 a = a.increment();
-console.log(a); // 101
-console.log(b); // 100
+console.log(String(a)); // 101
+console.log(String(b)); // 100
 ```
 
 ## When?
