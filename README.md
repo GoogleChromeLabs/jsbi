@@ -44,7 +44,7 @@ Its advantages over other, existing big-integer libraries are:
 
 Except for mechanical differences in syntax, you use JSBI-BigInts just [like you would use native BigInts](https://developers.google.com/web/updates/2018/05/bigint). Some things even look exactly the same, after you import `const BigInt = JSBI.BigInt`:
 
-| Operation            | native BigInts      | JSBI                 |
+| Operation            | native BigInts      | JSBI                |
 | -------------------- | ------------------- | ------------------- |
 | Creation from String | `a = BigInt('456')` | `a = BigInt('456')` |
 | Creation from Number | `a = BigInt(789)`   | `a = BigInt(789)`   |
@@ -53,26 +53,26 @@ Except for mechanical differences in syntax, you use JSBI-BigInts just [like you
 
 Most operators are replaced by method calls:
 
-| Operation                   | native BigInts | JSBI                       |
-| --------------------------- | -------------- | ------------------------- |
-| Addition                    | `c = a + b`    | `c = a.add(b)`            |
-| Subtraction                 | `c = a - b`    | `c = a.subtract(b)`       |
-| Multiplication              | `c = a * b`    | `c = a.multiply(b)`       |
-| Division                    | `c = a / b`    | `c = a.divide(b)`         |
-| Modulus                     | `c = a % b`    | `c = a.remainder(b)`      |
-| Exponentiation              | `c = a ** b`   | `c = a.exponentiate(b)`   |
-| Negation                    | `b = -a`       | `b = a.unaryMinus()`      |
-| Bitwise negation            | `b = ~a`       | `b = a.bitwiseNot()`      |
-| Left shifting               | `c = a << b`   | `c = a.leftShift(b)`      |
-| Right shifting              | `c = a >> b`   | `c = signedRightShift(b)` |
-| Bitwise “and”               | `c = a & b`    | `c = a.bitwiseAnd(b)`     |
-| Bitwise “or”                | `c = a \| b`   | `c = a.bitwiseOr(b)`      |
-| Bitwise “xor”               | `c = a ^ b`    | `c = a.bitwiseXor(b)`     |
-| Comparison to other BigInts | `a === b`      | `a.equal(b)`              |
-|                             | `a < b`        | `a.lessThan(b)`           |
-|                             | `a <= b`       | `a.lessThanOrEqual(b)`    |
-|                             | `a > b`        | `a.greaterThan(b)`        |
-|                             | `a >= b`       | `a.greaterThanOrEqual(b)` |
+| Operation                   | native BigInts | JSBI                        |
+| --------------------------- | -------------- | --------------------------- |
+| Addition                    | `c = a + b`    | `c = a.add(b)`              |
+| Subtraction                 | `c = a - b`    | `c = a.subtract(b)`         |
+| Multiplication              | `c = a * b`    | `c = a.multiply(b)`         |
+| Division                    | `c = a / b`    | `c = a.divide(b)`           |
+| Modulus                     | `c = a % b`    | `c = a.remainder(b)`        |
+| Exponentiation              | `c = a ** b`   | `c = a.exponentiate(b)`     |
+| Negation                    | `b = -a`       | `b = a.unaryMinus()`        |
+| Bitwise negation            | `b = ~a`       | `b = a.bitwiseNot()`        |
+| Left shifting               | `c = a << b`   | `c = a.leftShift(b)`        |
+| Right shifting              | `c = a >> b`   | `c = a.signedRightShift(b)` |
+| Bitwise “and”               | `c = a & b`    | `c = a.bitwiseAnd(b)`       |
+| Bitwise “or”                | `c = a \| b`   | `c = a.bitwiseOr(b)`        |
+| Bitwise “xor”               | `c = a ^ b`    | `c = a.bitwiseXor(b)`       |
+| Comparison to other BigInts | `a === b`      | `a.equal(b)`                |
+|                             | `a < b`        | `a.lessThan(b)`             |
+|                             | `a <= b`       | `a.lessThanOrEqual(b)`      |
+|                             | `a > b`        | `a.greaterThan(b)`          |
+|                             | `a >= b`       | `a.greaterThanOrEqual(b)`   |
 
 The functions above operate only on BigInts. (They don’t perform type checks in the current implementation, because such checks are a waste of time when we assume that you know what you’re doing. Don’t try to call them with other inputs, or you’ll get “interesting” failures!)
 
