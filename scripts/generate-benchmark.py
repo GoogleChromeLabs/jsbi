@@ -222,7 +222,7 @@ class TestGenerator(object):
   def EmitTestBodyJSB(self):
     return TEST_BODY % {"variant": "Jsb",
                         "testop": self.GetTestOpJSB(),
-                        "comparison": "!r.equal(d.r)",
+                        "comparison": "!JSBI.equal(r, d.r)",
                         "inputs": self.GetInputPrinter(),
                         "opname": self.GetOpMethod()}
 
@@ -273,7 +273,7 @@ class UnaryOp(TestGenerator):
     return "d.a; r = %sr" % self.GetOpString()
 
   def GetTestOpJSB(self):
-    return "d.a.%s()" % self.GetOpMethod()
+    return "JSBI.%s(d.a)" % self.GetOpMethod()
 
 class BinaryOp(TestGenerator):
   # Subclasses must implement these.
@@ -310,7 +310,7 @@ class BinaryOp(TestGenerator):
     return "d.a %s d.b" % self.GetOpString()
 
   def GetTestOpJSB(self):
-    return "d.a.%s(d.b)" % self.GetOpMethod()
+    return "JSBI.%s(d.a, d.b)" % self.GetOpMethod()
 
 class Neg(UnaryOp):
   def GetOpString(self): return "-"

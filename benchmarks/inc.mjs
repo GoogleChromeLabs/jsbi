@@ -687,8 +687,8 @@ function testNative(data, reps) {
 function testJsb(data, reps) {
   for (let i = 0; i < data.length; i++) {
     const d = data[i];
-    const r = d.a.increment();
-    if (!r.equal(d.r)) {
+    const r = JSBI.increment(d.a);
+    if (!JSBI.equal(r, d.r)) {
       console.log('Input:    ' + d.a.toString(16));
       console.log('Result:   ' + r.toString(16));
       console.log('Expected: ' + d.r.toString(16));
@@ -701,7 +701,7 @@ function testJsb(data, reps) {
   for (let j = 0; j < reps; j++) {
     for (let i = 0; i < data.length; i++) {
       const d = data[i];
-      r = d.a.increment();
+      r = JSBI.increment(d.a);
     }
   }
   return Date.now() - t1;
