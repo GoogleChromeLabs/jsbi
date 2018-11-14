@@ -322,16 +322,6 @@ class BitNot(UnaryOp):
   def GetOpMethod(self): return "bitwiseNot"
   def GenerateResult(self, x): return ~x
 
-class Inc(UnaryOp):
-  def GetOpString(self): return "++"
-  def GetOpMethod(self): return "increment"
-  def GenerateResult(self, x): return x + 1
-
-class Dec(UnaryOp):
-  def GetOpString(self): return "--"
-  def GetOpMethod(self): return "decrement"
-  def GenerateResult(self, x): return x - 1
-
 class Add(BinaryOp):
   def GetOpString(self): return "+"
   def GetOpMethod(self): return "add"

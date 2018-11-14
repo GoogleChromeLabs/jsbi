@@ -75,8 +75,8 @@ class JSBI extends Array {
   }
 
   // Equivalent of "Number(my_bigint)" in the native implementation.
-  toNumber() {
-    return JSBI.__toNumber(this);
+  static toNumber(x) {
+    return JSBI.__toNumber(x);
   }
 
   // Operations.
@@ -134,7 +134,7 @@ class JSBI extends Array {
     }
     let result = null;
     let runningSquare = x;
-    // x implicitly sets the result's sign correctly.
+    // This implicitly sets the result's sign correctly.
     if ((expValue & 1) !== 0) result = x;
     expValue >>= 1;
     for (; expValue !== 0; expValue >>= 1) {
@@ -333,24 +333,6 @@ class JSBI extends Array {
     return JSBI.__absoluteAddOne(result, true, result).__trim();
   }
 
-  static increment(x) {
-    if (x.sign) {
-      const result = JSBI.__absoluteSubOne(x);
-      result.sign = true;
-      return result.__trim();
-    }
-    return JSBI.__absoluteAddOne(x, false, null);
-  }
-
-  static decrement(x) {
-    if (x.sign) {
-      return JSBI.__absoluteAddOne(x, true);
-    } else if (x.length === 0) {
-      return JSBI.__oneDigit(1, true);
-    }
-    return JSBI.__absoluteSubOne(x).__trim();
-  }
-
   // Operators.
 
   static ADD(x, y) {
@@ -394,7 +376,7 @@ class JSBI extends Array {
         if (JSBI.__isBigInt(y)) return JSBI.equal(x, y);
         return JSBI.EQ(y, x);
       } else if (typeof x === 'number') {
-        if (JSBI.__isBigInt(y)) return JSBI.__equaltoNumber(y, x);
+        if (JSBI.__isBigInt(y)) return JSBI.__equalToNumber(y, x);
         if (typeof y !== 'object') return x == y;
         y = JSBI.__toPrimitive(y);
       } else if (typeof x === 'string') {
@@ -406,7 +388,7 @@ class JSBI extends Array {
         if (typeof y !== 'object') return x == y;
         y = JSBI.__toPrimitive(y);
       } else if (typeof x === 'boolean') {
-        if (JSBI.__isBigInt(y)) return JSBI.__equaltoNumber(y, +x);
+        if (JSBI.__isBigInt(y)) return JSBI.__equalToNumber(y, +x);
         if (typeof y !== 'object') return x == y;
         y = JSBI.__toPrimitive(y);
       } else if (typeof x === 'symbol') {
@@ -1108,7 +1090,7 @@ class JSBI extends Array {
     return 0;
   }
 
-  static __equaltoNumber(x, y) {
+  static __equalToNumber(x, y) {
     if (y | 0 === y) {
       if (y === 0) return x.length === 0;
       // Any multi-digit BigInt is bigger than an int32.

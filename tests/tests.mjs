@@ -12,14 +12,13 @@
 // limitations under the License.
 
 import JSBI from '../jsbi.mjs';
-const JSBigInt = JSBI.BigInt;
 
 {
   // Test the example from the README.
-  const max = JSBigInt(Number.MAX_SAFE_INTEGER);
+  const max = JSBI.BigInt(Number.MAX_SAFE_INTEGER);
   // → 9007199254740991
-  const other = JSBigInt(2);
-  const result = max.add(other);
+  const other = JSBI.BigInt(2);
+  const result = JSBI.add(max, other);
   // → 9007199254740993
   console.assert('9007199254740993' === result.toString());
 }
@@ -35,15 +34,15 @@ const TESTS = [
 
 function parse(string) {
   if (string.charCodeAt(0) === 0x2D) { // '-'
-    const result = JSBigInt(string.slice(1));
+    const result = JSBI.BigInt(string.slice(1));
     result.sign = true;
     return result;
   }
-  return JSBigInt(string);
+  return JSBI.BigInt(string);
 }
 
 function hex(jsb) {
-  if (jsb.lessThan(0)) {
+  if (JSBI.lessThan(jsb, 0)) {
     return `-0x${ jsb.toString(16).slice(1).toUpperCase() }`;
   }
   return `0x${ jsb.toString(16).toUpperCase() }`;
@@ -54,9 +53,9 @@ for (const test of TESTS) {
   const a = parse(test.a);
   const b = parse(test.b);
   const expected = parse(test.expected);
-  const result = a[operation](b);
+  const result = JSBI[operation](a, b);
   console.assert(
-    result.equal(expected),
+    JSBI.equal(result, expected),
     `
       Unexpected result.
       ${ hex(a) } ${ operation } ${ hex(b) }

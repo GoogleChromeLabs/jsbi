@@ -12,13 +12,12 @@ npm install jsbi --save
 
 ```js
 import JSBI from './jsbi.mjs';
-const JSBigInt = JSBI.BigInt;
 
-const max = JSBigInt(Number.MAX_SAFE_INTEGER);
+const max = JSBI.BigInt(Number.MAX_SAFE_INTEGER);
 console.log(String(max));
 // → '9007199254740991'
-const other = JSBigInt('2');
-const result = max.add(other);
+const other = JSBI.BigInt('2');
+const result = JSBI.add(max, other);
 console.log(String(result));
 // → '9007199254740993'
 ```
@@ -49,7 +48,7 @@ Except for mechanical differences in syntax, you use JSBI-BigInts just [like you
 | Creation from String | `a = BigInt('456')` | `a = JSBI.BigInt('456')` |
 | Creation from Number | `a = BigInt(789)`   | `a = JSBI.BigInt(789)`   |
 | Conversion to String | `a.toString(radix)` | `a.toString(radix)`      |
-| Conversion to Number | `Number(a)`         | `a.toNumber()`           |
+| Conversion to Number | `Number(a)`         | `JSBI.toNumber(a)`       |
 
 Most operators are replaced by method calls:
 
@@ -91,13 +90,15 @@ The variable names `x` and `y` here indicate that the variables can refer to any
 
 Unfortunately, there are also a few things that are not supported at all:
 
-| Unsupported operation | native BigInts | JSBI                |
-| --------------------- | -------------- | ------------------- |
-| literals              | `a = 123n;`    | N/A ☹               |
-| increment             | `a++`          | N/A ☹               |
-|                       | `a + 1n`       | `JSBI.increment(a)` |
-| decrement             | `a--`          | N/A ☹               |
-|                       | `a - 1n`       | `JSBI.decrement(a)` |
+| Unsupported operation | native BigInts | JSBI                                 |
+| --------------------- | -------------- | ------------------------------------ |
+| literals              | `a = 123n;`    | N/A ☹                                |
+| increment             | `a++`          | N/A ☹                                |
+|                       | `a + 1n`       | `JSBI.add(a, JSBI.BigInt('1'))`      |
+| decrement             | `a--`          | N/A ☹                                |
+|                       | `a - 1n`       | `JSBI.subtract(a, JSBI.BigInt('1'))` |
+
+It is impossible to replicate the exact behavior of the native `++` and `--` operators with static functions. Since JSBI is intended to be transpiled away eventually, it doesn’t provide a similar-but-different alternative. You can use `JSBI.add()` and `JSBI.subtract()` instead.
 
 ## When?
 
