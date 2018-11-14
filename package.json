@@ -16,9 +16,9 @@
   "scripts": {
     "build": "rollup --config rollup.config.mjs",
     "dev": "rollup --config rollup.config.mjs --watch",
-    "test": "set -e; for file in benchmarks/*.mjs; do node --no-warnings --experimental-modules \"${file}\"; done",
+    "test": "node --experimental-modules tests/tests.mjs; set -e; for file in benchmarks/*.mjs; do node --no-warnings --experimental-modules \"${file}\"; done",
     "pretest": "npm run build",
     "lint": "eslint --fix jsbi.mjs",
-    "generate-benchmarks": "for op in add and dec div inc mod mul neg not or sar shl sub xor; do scripts/generate-benchmark.py generate \"${op}\" > \"benchmarks/${op}.mjs\"; done"
+    "generate-benchmarks": "for op in add and div mod mul neg not or sar shl sub xor; do scripts/generate-benchmark.py generate \"${op}\" > \"benchmarks/${op}.mjs\"; done"
   }
 }

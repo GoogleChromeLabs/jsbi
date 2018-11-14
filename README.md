@@ -12,13 +12,12 @@ npm install jsbi --save
 
 ```js
 import JSBI from './jsbi.mjs';
-const JSBigInt = JSBI.BigInt;
 
-const max = JSBigInt(Number.MAX_SAFE_INTEGER);
+const max = JSBI.BigInt(Number.MAX_SAFE_INTEGER);
 console.log(String(max));
 // → '9007199254740991'
-const other = JSBigInt('2');
-const result = max.add(other);
+const other = JSBI.BigInt('2');
+const result = JSBI.add(max, other);
 console.log(String(result));
 // → '9007199254740993'
 ```
@@ -42,37 +41,37 @@ Its advantages over other, existing big-integer libraries are:
 
 ## How?
 
-Except for mechanical differences in syntax, you use JSBI-BigInts just [like you would use native BigInts](https://developers.google.com/web/updates/2018/05/bigint). Some things even look exactly the same, after you import `const BigInt = JSBI.BigInt`:
+Except for mechanical differences in syntax, you use JSBI-BigInts just [like you would use native BigInts](https://developers.google.com/web/updates/2018/05/bigint). Some things even look the same, after you replace `BigInt` with `JSBI.BigInt`:
 
-| Operation            | native BigInts      | JSBI                 |
-| -------------------- | ------------------- | ------------------- |
-| Creation from String | `a = BigInt('456')` | `a = BigInt('456')` |
-| Creation from Number | `a = BigInt(789)`   | `a = BigInt(789)`   |
-| Conversion to String | `a.toString(radix)` | `a.toString(radix)` |
-| Conversion to Number | `Number(a)`         | `a.toNumber()`      |
+| Operation            | native BigInts      | JSBI                     |
+| -------------------- | ------------------- | ------------------------ |
+| Creation from String | `a = BigInt('456')` | `a = JSBI.BigInt('456')` |
+| Creation from Number | `a = BigInt(789)`   | `a = JSBI.BigInt(789)`   |
+| Conversion to String | `a.toString(radix)` | `a.toString(radix)`      |
+| Conversion to Number | `Number(a)`         | `JSBI.toNumber(a)`       |
 
 Most operators are replaced by method calls:
 
-| Operation                   | native BigInts | JSBI                       |
-| --------------------------- | -------------- | ------------------------- |
-| Addition                    | `c = a + b`    | `c = a.add(b)`            |
-| Subtraction                 | `c = a - b`    | `c = a.subtract(b)`       |
-| Multiplication              | `c = a * b`    | `c = a.multiply(b)`       |
-| Division                    | `c = a / b`    | `c = a.divide(b)`         |
-| Modulus                     | `c = a % b`    | `c = a.remainder(b)`      |
-| Exponentiation              | `c = a ** b`   | `c = a.exponentiate(b)`   |
-| Negation                    | `b = -a`       | `b = a.unaryMinus()`      |
-| Bitwise negation            | `b = ~a`       | `b = a.bitwiseNot()`      |
-| Left shifting               | `c = a << b`   | `c = a.leftShift(b)`      |
-| Right shifting              | `c = a >> b`   | `c = signedRightShift(b)` |
-| Bitwise “and”               | `c = a & b`    | `c = a.bitwiseAnd(b)`     |
-| Bitwise “or”                | `c = a \| b`   | `c = a.bitwiseOr(b)`      |
-| Bitwise “xor”               | `c = a ^ b`    | `c = a.bitwiseXor(b)`     |
-| Comparison to other BigInts | `a === b`      | `a.equal(b)`              |
-|                             | `a < b`        | `a.lessThan(b)`           |
-|                             | `a <= b`       | `a.lessThanOrEqual(b)`    |
-|                             | `a > b`        | `a.greaterThan(b)`        |
-|                             | `a >= b`       | `a.greaterThanOrEqual(b)` |
+| Operation                   | native BigInts | JSBI                              |
+| --------------------------- | -------------- | --------------------------------- |
+| Addition                    | `c = a + b`    | `c = JSBI.add(a, b)`              |
+| Subtraction                 | `c = a - b`    | `c = JSBI.subtract(a, b)`         |
+| Multiplication              | `c = a * b`    | `c = JSBI.multiply(a, b)`         |
+| Division                    | `c = a / b`    | `c = JSBI.divide(a, b)`           |
+| Modulus                     | `c = a % b`    | `c = JSBI.remainder(a, b)`        |
+| Exponentiation              | `c = a ** b`   | `c = JSBI.exponentiate(a, b)`     |
+| Negation                    | `b = -a`       | `b = JSBI.unaryMinus(a, )`        |
+| Bitwise negation            | `b = ~a`       | `b = JSBI.bitwiseNot(a, )`        |
+| Left shifting               | `c = a << b`   | `c = JSBI.leftShift(a, b)`        |
+| Right shifting              | `c = a >> b`   | `c = JSBI.signedRightShift(a, b)` |
+| Bitwise “and”               | `c = a & b`    | `c = JSBI.bitwiseAnd(a, b)`       |
+| Bitwise “or”                | `c = a \| b`   | `c = JSBI.bitwiseOr(a, b)`        |
+| Bitwise “xor”               | `c = a ^ b`    | `c = JSBI.bitwiseXor(a, b)`       |
+| Comparison to other BigInts | `a === b`      | `JSBI.equal(a, b)`                |
+|                             | `a < b`        | `JSBI.lessThan(a, b)`             |
+|                             | `a <= b`       | `JSBI.lessThanOrEqual(a, b)`      |
+|                             | `a > b`        | `JSBI.greaterThan(a, b)`          |
+|                             | `a >= b`       | `JSBI.greaterThanOrEqual(a, b)`   |
 
 The functions above operate only on BigInts. (They don’t perform type checks in the current implementation, because such checks are a waste of time when we assume that you know what you’re doing. Don’t try to call them with other inputs, or you’ll get “interesting” failures!)
 
@@ -91,33 +90,15 @@ The variable names `x` and `y` here indicate that the variables can refer to any
 
 Unfortunately, there are also a few things that are not supported at all:
 
-| Unsupported operation | native BigInts | JSBI            |
-| --------------------- | -------------- | --------------- |
-| literals              | `a = 123n;`    | N/A ☹           |
-| increment             | `a++`          | N/A ☹           |
-|                       | `a + 1n`       | `a.increment()` |
-| decrement             | `a--`          | N/A ☹           |
-|                       | `a - 1n`       | `a.decrement()` |
+| Unsupported operation | native BigInts | JSBI                                 |
+| --------------------- | -------------- | ------------------------------------ |
+| literals              | `a = 123n;`    | N/A ☹                                |
+| increment             | `a++`          | N/A ☹                                |
+|                       | `a + 1n`       | `JSBI.add(a, JSBI.BigInt('1'))`      |
+| decrement             | `a--`          | N/A ☹                                |
+|                       | `a - 1n`       | `JSBI.subtract(a, JSBI.BigInt('1'))` |
 
-It is impossible to replicate the behavior of the native `++` and `--` operators with methods on objects. Consider this example using native BigInts:
-
-```js
-let a = 100n;
-const b = a;
-a++;
-console.log(String(a)); // 101
-console.log(String(b)); // 100
-```
-
-A BigInt library has two choices: an `a.increment()` method can either modify the object, or leave the object as it is and just return the incremented value. If it modifies the object, then the `console.log(a)` statement would print the same value as the native implementation, but the `console.log(b)` statement would not (it would also print the incremented value). If it leaves the object as-is, then `b` is correctly not mutated, but to see the effect on `a`, one has to write `a = a.increment()`. JSBI makes the latter choice. Thus, the complete equivalent JSBI code is:
-
-```js
-let a = JSBI.BigInt('100');
-const b = a;
-a = a.increment();
-console.log(String(a)); // 101
-console.log(String(b)); // 100
-```
+It is impossible to replicate the exact behavior of the native `++` and `--` operators with static functions. Since JSBI is intended to be transpiled away eventually, it doesn’t provide a similar-but-different alternative. You can use `JSBI.add()` and `JSBI.subtract()` instead.
 
 ## When?
 

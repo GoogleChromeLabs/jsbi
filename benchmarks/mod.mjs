@@ -888,8 +888,8 @@ function testNative(data, reps) {
 function testJsb(data, reps) {
   for (let i = 0; i < data.length; i++) {
     const d = data[i];
-    const r = d.a.remainder(d.b);
-    if (!r.equal(d.r)) {
+    const r = JSBI.remainder(d.a, d.b);
+    if (!JSBI.equal(r, d.r)) {
       console.log('Input A:  ' + d.a.toString(16));
       console.log('Input B:  ' + d.b.toString(16));
       console.log('Result:   ' + r.toString(16));
@@ -903,7 +903,7 @@ function testJsb(data, reps) {
   for (let j = 0; j < reps; j++) {
     for (let i = 0; i < data.length; i++) {
       const d = data[i];
-      r = d.a.remainder(d.b);
+      r = JSBI.remainder(d.a, d.b);
     }
   }
   return Date.now() - t1;
