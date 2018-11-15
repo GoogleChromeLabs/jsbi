@@ -418,62 +418,56 @@ class JSBI extends Array {
     JSBI.BigInt = function(x) {
       return new JSBI(0, BigInt(x));
     };
-    JSBI.prototype.unaryMinus = function() {
-      return new JSBI(0, -this.sign);
+    JSBI.unaryMinus = function(x) {
+      return new JSBI(0, -x.sign);
     };
-    JSBI.prototype.bitwiseNot = function() {
-      return new JSBI(0, ~this.sign);
+    JSBI.bitwiseNot = function(x) {
+      return new JSBI(0, ~x.sign);
     };
-    JSBI.prototype.exponentiate = function(y) {
-      return new JSBI(0, this.sign ** y.sign);
+    JSBI.exponentiate = function(x, y) {
+      return new JSBI(0, x.sign ** y.sign);
     };
-    JSBI.prototype.multiply = function(y) {
-      return new JSBI(0, this.sign * y.sign);
+    JSBI.multiply = function(x, y) {
+      return new JSBI(0, x.sign * y.sign);
     };
-    JSBI.prototype.divide = function(y) {
-      return new JSBI(0, this.sign / y.sign);
+    JSBI.divide = function(x, y) {
+      return new JSBI(0, x.sign / y.sign);
     };
-    JSBI.prototype.remainder = function(y) {
-      return new JSBI(0, this.sign % y.sign);
+    JSBI.remainder = function(x, y) {
+      return new JSBI(0, x.sign % y.sign);
     };
-    JSBI.prototype.add = function(y) {
-      return new JSBI(0, this.sign + y.sign);
+    JSBI.add = function(x, y) {
+      return new JSBI(0, x.sign + y.sign);
     };
-    JSBI.prototype.subtract = function(y) {
-      return new JSBI(0, this.sign - y.sign);
+    JSBI.subtract = function(x, y) {
+      return new JSBI(0, x.sign - y.sign);
     };
-    JSBI.prototype.leftShift = function(y) {
-      return new JSBI(0, this.sign << y.sign);
+    JSBI.leftShift = function(x, y) {
+      return new JSBI(0, x.sign << y.sign);
     };
-    JSBI.prototype.signedRightShift = function(y) {
-      return new JSBI(0, this.sign >> y.sign);
+    JSBI.signedRightShift = function(x, y) {
+      return new JSBI(0, x.sign >> y.sign);
     };
-    JSBI.prototype.lessThan = function(y) {
-      return this.sign < y.sign;
+    JSBI.lessThan = function(x, y) {
+      return x.sign < y.sign;
     };
-    JSBI.prototype.equal = function(y) {
-      return this.sign === y.sign;
+    JSBI.equal = function(x, y) {
+      return x.sign === y.sign;
     };
-    JSBI.prototype.bitwiseAnd = function(y) {
-      return new JSBI(0, this.sign & y.sign);
+    JSBI.bitwiseAnd = function(x, y) {
+      return new JSBI(0, x.sign & y.sign);
     };
-    JSBI.prototype.bitwiseXor = function(y) {
-      return new JSBI(0, this.sign ^ y.sign);
+    JSBI.bitwiseXor = function(x, y) {
+      return new JSBI(0, x.sign ^ y.sign);
     };
-    JSBI.prototype.bitwiseOr = function(y) {
-      return new JSBI(0, this.sign | y.sign);
+    JSBI.bitwiseOr = function(x, y) {
+      return new JSBI(0, x.sign | y.sign);
     };
-    JSBI.prototype.toString = function(radix) {
+    JSBI.toString = function(radix) {
       return this.sign.toString(radix);
     };
-    JSBI.prototype.toNumber = function() {
-      return Number(this.sign);
-    };
-    JSBI.prototype.increment = function() {
-      return new JSBI(0, ++this.sign);
-    };
-    JSBI.prototype.decrement = function() {
-      return new JSBI(0, --this.sign);
+    JSBI.toNumber = function(x) {
+      return Number(x.sign);
     };
     JSBI.ADD = function(x, y) {
       if (JSBI.__isBigInt(x)) x = x.sign;
