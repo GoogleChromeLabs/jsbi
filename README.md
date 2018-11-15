@@ -58,7 +58,7 @@ Most operators are replaced by method calls:
 | Subtraction                 | `c = a - b`    | `c = JSBI.subtract(a, b)`         |
 | Multiplication              | `c = a * b`    | `c = JSBI.multiply(a, b)`         |
 | Division                    | `c = a / b`    | `c = JSBI.divide(a, b)`           |
-| Modulus                     | `c = a % b`    | `c = JSBI.remainder(a, b)`        |
+| Remainder                   | `c = a % b`    | `c = JSBI.remainder(a, b)`        |
 | Exponentiation              | `c = a ** b`   | `c = JSBI.exponentiate(a, b)`     |
 | Negation                    | `b = -a`       | `b = JSBI.unaryMinus(a, )`        |
 | Bitwise negation            | `b = ~a`       | `b = JSBI.bitwiseNot(a, )`        |
