@@ -102,18 +102,11 @@ It is impossible to replicate the exact behavior of the native `++` and `--` ope
 
 ## When?
 
-Now! The JSBI library is ready for use today. To use it in your code, simply include it, and (optionally, for convenience) define `const BigInt = JSBI.BigInt`.
+Now! The JSBI library is ready for use today.
 
-If you want, you can also instruct it to use the native BigInt implementation as its backend when it can: `JSBI.useNativeBigIntsIfAvailable()` swaps out the custom backend for redirects to the current environment’s native implementation. Currently this makes some operations faster and some slower, so there’s no strong reason either way, but it can be interesting for testing. **Important**: If you do this, do it _before_ any `const BigInt = JSBI.BigInt` assignment!
+View [our issue tracker](https://github.com/GoogleChromeLabs/jsbi/issues) to learn more about out our future plans for JSBI, and please join the discussion!
 
-Plans for the future include:
-
-- [issue #1](https://github.com/GoogleChromeLabs/jsbi/issues/1): introduce shorthands for operations (e.g. `exp` for `exponentiate`, and so on). The current method names follow the spec proposal. (If you have suggestions for naming schemes, please speak up!)
-- [issue #2](https://github.com/GoogleChromeLabs/jsbi/issues/2): create a tool to translate code using JSBI syntax to native BigInt syntax. (If you’d like to help, please speak up!)
-- [issue #3](https://github.com/GoogleChromeLabs/jsbi/issues/3): the current implementation has been tested quite well, but even more rigorous testing is always possible. (Should you find any bugs, please report them!)
-- [issue #4](https://github.com/GoogleChromeLabs/jsbi/issues/4): investigate the feasibility of polyfilling `BigInt64Array`/`BigUint64Array` and the `DataView.{get,set}Big{Int,Uint}64` functions.
-
-A more vague plan is to use the JSBI library (or an extension to it) as a staging ground for additional BigInt-related functionality. The official proposal is intentionally somewhat minimal, and leaves further “library functions” for follow-up proposals. Examples are a combined `exp`+`mod` function, and bit manipulation functions.
+A more vague future plan is to use the JSBI library (or an extension to it) as a staging ground for additional BigInt-related functionality. The official proposal is intentionally somewhat minimal, and leaves further “library functions” for follow-up proposals. Examples are a combined `exp`+`mod` function, and bit manipulation functions.
 
 ## Development
 
