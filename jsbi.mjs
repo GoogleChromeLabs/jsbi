@@ -56,7 +56,7 @@ class JSBI extends Array {
   toDebugString() {
     const result = ['BigInt['];
     for (const digit of this) {
-      result.push((digit ? digit.toString(16) : digit) + ', ');
+      result.push((digit ? (digit >>> 0).toString(16) : digit) + ', ');
     }
     result.push(']');
     return result.join('');
@@ -1521,8 +1521,8 @@ class JSBI extends Array {
       this.__setDigit(startIndex + i, (r16 << 16) | (r0 & 0xFFFF));
       const subTop = sub >>> 16;
       if (startIndex + i + 1 >= this.length) {
-throw new RangeError('out of bounds');
-}
+        throw new RangeError('out of bounds');
+      }
       current = this.__digit(startIndex + i + 1);
       if (subTop !== 0 || current !== 0) {
         r0 = (current & 0xFFFF) - subTop - borrow;
@@ -1532,7 +1532,8 @@ throw new RangeError('out of bounds');
       }
     } else {
       startIndex >>= 1;
-      for (let i = 0; i < subtrahend.length; i++) {
+      let i = 0;
+      for (; i < subtrahend.length - 1; i++) {
         const current = this.__digit(startIndex + i);
         const sub = subtrahend.__digit(i);
         const r0 = (current & 0xFFFF) - (sub & 0xFFFF) - borrow;
@@ -1541,6 +1542,16 @@ throw new RangeError('out of bounds');
         borrow = (r16 >>> 16) & 1;
         this.__setDigit(startIndex + i, (r16 << 16) | (r0 & 0xFFFF));
       }
+      const current = this.__digit(startIndex + i);
+      const sub = subtrahend.__digit(i);
+      const r0 = (current & 0xFFFF) - (sub & 0xFFFF) - borrow;
+      borrow = (r0 >>> 16) & 1;
+      let r16 = 0;
+      if ((current >>> 16) !== 0 || (sub >>> 16) !== 0) {
+        r16 = (current >>> 16) - (sub >>> 16) - borrow;
+        borrow = (r16 >>> 16) & 1;
+      }
+      this.__setDigit(startIndex + i, (r16 << 16) | (r0 & 0xFFFF));
     }
     return borrow;
   }
