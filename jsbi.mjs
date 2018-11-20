@@ -576,18 +576,18 @@ class JSBI extends Array {
     return result.__trim();
   }
 
-  static __iswhitespace(c) {
-    if (c <= 13 && c >= 9) return true;
-    if (c <= 159) return c === 32;
-    if (c <= 0x1ffff) {
-      return c === 160 || c === 5760;
+  static __isWhitespace(c) {
+    if (c <= 0x0D && c >= 0x09) return true;
+    if (c <= 0x9F) return c === 0x20;
+    if (c <= 0x01FFFF) {
+      return c === 0xA0 || c === 0x1680;
     }
-    if (c <= 0x2ffff) {
-      c &= 0x1ffff;
-      return c <= 10 || c === 40 || c === 41 || c === 47 ||
-             c === 95 || c === 4096;
+    if (c <= 0x02FFFF) {
+      c &= 0x01FFFF;
+      return c <= 0x0A || c === 0x28 || c === 0x29 || c === 0x2F ||
+             c === 0x5F || c === 0x1000;
     }
-    return c === 65279;
+    return c === 0xFEFF;
   }
 
   static __fromString(string, radix = 0) {
@@ -598,7 +598,7 @@ class JSBI extends Array {
     if (cursor === length) return JSBI.__zero();
     let current = string.charCodeAt(cursor);
     // Skip whitespace.
-    while (JSBI.__iswhitespace(current)) {
+    while (JSBI.__isWhitespace(current)) {
       if (++cursor === length) return JSBI.__zero();
       current = string.charCodeAt(cursor);
     }
@@ -738,7 +738,7 @@ class JSBI extends Array {
     }
 
     while (cursor !== length) {
-      if (!JSBI.__iswhitespace(current)) return null;
+      if (!JSBI.__isWhitespace(current)) return null;
       current = string.charCodeAt(cursor++);
     }
 
