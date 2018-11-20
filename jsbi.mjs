@@ -68,7 +68,7 @@ class JSBI extends Array {
           'toString() radix argument must be between 2 and 36');
     }
     if (this.length === 0) return '0';
-    if ((radix & (radix-1)) === 0) {
+    if ((radix & (radix - 1)) === 0) {
       return JSBI.__toStringBasePowerOfTwo(this, radix);
     }
     return JSBI.__toStringGeneric(this, radix, false);
@@ -76,7 +76,61 @@ class JSBI extends Array {
 
   // Equivalent of "Number(my_bigint)" in the native implementation.
   static toNumber(x) {
-    return JSBI.__toNumber(x);
+    const xLength = x.length;
+    if (xLength === 0) return 0;
+    if (xLength === 1) {
+      const value = x.__unsignedDigit(0);
+      return x.sign ? -value : value;
+    }
+    const xMsd = x.__digit(xLength - 1);
+    const msdLeadingZeros = Math.clz32(xMsd);
+    const xBitLength = xLength * 32 - msdLeadingZeros;
+    if (xBitLength > 1024) return x.sign ? -Infinity : Infinity;
+    let exponent = xBitLength - 1;
+    let currentDigit = xMsd;
+    let digitIndex = xLength - 1;
+    const shift = msdLeadingZeros + 1;
+    let mantissaHigh = (shift === 32) ? 0 : currentDigit << shift;
+    mantissaHigh >>>= 12;
+    const mantissaHighBitsUnset = shift - 12;
+    let mantissaLow = (shift >= 12) ? 0 : (currentDigit << (20 + shift));
+    let mantissaLowBitsUnset = 20 + shift;
+    if (mantissaHighBitsUnset > 0 && digitIndex > 0) {
+      digitIndex--;
+      currentDigit = x.__digit(digitIndex);
+      mantissaHigh |= (currentDigit >>> (32 - mantissaHighBitsUnset));
+      mantissaLow = currentDigit << mantissaHighBitsUnset;
+      mantissaLowBitsUnset = mantissaHighBitsUnset;
+    }
+    if (mantissaLowBitsUnset > 0 && digitIndex > 0) {
+      digitIndex--;
+      currentDigit = x.__digit(digitIndex);
+      mantissaLow |= (currentDigit >>> (32 - mantissaLowBitsUnset));
+      mantissaLowBitsUnset -= 32;
+    }
+    const rounding = JSBI.__decideRounding(x, mantissaLowBitsUnset,
+        digitIndex, currentDigit);
+    if (rounding === 1 || (rounding === 0 && (mantissaLow & 1) === 1)) {
+      mantissaLow = (mantissaLow + 1) >>> 0;
+      if (mantissaLow === 0) {
+        // Incrementing mantissaLow overflowed.
+        mantissaHigh++;
+        if ((mantissaHigh >>> 20) !== 0) {
+          // Incrementing mantissaHigh overflowed.
+          mantissaHigh = 0;
+          exponent++;
+          if (exponent > 1023) {
+            // Incrementing the exponent overflowed.
+            return x.sign ? -Infinity : Infinity;
+          }
+        }
+      }
+    }
+    const signBit = x.sign ? (1 << 31) : 0;
+    exponent = (exponent + 0x3FF) << 20;
+    JSBI.__kBitConversionInts[1] = signBit | exponent | mantissaHigh;
+    JSBI.__kBitConversionInts[0] = mantissaLow;
+    return JSBI.__kBitConversionDouble[0];
   }
 
   // Operations.
@@ -440,64 +494,6 @@ class JSBI extends Array {
     for (let i = 0; i < this.length; i++) {
       this[i] = 0;
     }
-  }
-
-  static __toNumber(x) {
-    const xLength = x.length;
-    if (xLength === 0) return 0;
-    if (xLength === 1) {
-      const value = x.__unsignedDigit(0);
-      return x.sign ? -value : value;
-    }
-    const xMsd = x.__digit(xLength - 1);
-    const msdLeadingZeros = Math.clz32(xMsd);
-    const xBitLength = xLength * 32 - msdLeadingZeros;
-    if (xBitLength > 1024) return x.sign ? -Infinity : Infinity;
-    let exponent = xBitLength - 1;
-    let currentDigit = xMsd;
-    let digitIndex = xLength - 1;
-    const shift = msdLeadingZeros + 1;
-    let mantissaHigh = (shift === 32) ? 0 : currentDigit << shift;
-    mantissaHigh >>>= 12;
-    const mantissaHighBitsUnset = shift - 12;
-    let mantissaLow = (shift >= 12) ? 0 : (currentDigit << (20 + shift));
-    let mantissaLowBitsUnset = 20 + shift;
-    if (mantissaHighBitsUnset > 0 && digitIndex > 0) {
-      digitIndex--;
-      currentDigit = x.__digit(digitIndex);
-      mantissaHigh |= (currentDigit >>> (32 - mantissaHighBitsUnset));
-      mantissaLow = currentDigit << mantissaHighBitsUnset;
-      mantissaLowBitsUnset = mantissaHighBitsUnset;
-    }
-    if (mantissaLowBitsUnset > 0 && digitIndex > 0) {
-      digitIndex--;
-      currentDigit = x.__digit(digitIndex);
-      mantissaLow |= (currentDigit >>> (32 - mantissaLowBitsUnset));
-      mantissaLowBitsUnset -= 32;
-    }
-    const rounding = JSBI.__decideRounding(x, mantissaLowBitsUnset,
-        digitIndex, currentDigit);
-    if (rounding === 1 || (rounding === 0 && (mantissaLow & 1) === 1)) {
-      mantissaLow = (mantissaLow + 1) >>> 0;
-      if (mantissaLow === 0) {
-        // Incrementing mantissaLow overflowed.
-        mantissaHigh++;
-        if ((mantissaHigh >>> 20) !== 0) {
-          // Incrementing mantissaHigh overflowed.
-          mantissaHigh = 0;
-          exponent++;
-          if (exponent > 1023) {
-            // Incrementing the exponent overflowed.
-            return x.sign ? -Infinity : Infinity;
-          }
-        }
-      }
-    }
-    const signBit = x.sign ? (1 << 31) : 0;
-    exponent = (exponent + 0x3FF) << 20;
-    JSBI.__kBitConversionInts[1] = signBit | exponent | mantissaHigh;
-    JSBI.__kBitConversionInts[0] = mantissaLow;
-    return JSBI.__kBitConversionDouble[0];
   }
 
   static __decideRounding(x, mantissaBitsUnset, digitIndex, currentDigit) {
