@@ -30,6 +30,18 @@ const TESTS = [
     b: '-0xF3CF5EDD759DBCC7449962CDB52AE0295BE7306D51555C70',
     expected: '-0x1034209C3C2F251E3F2EF7068FA5CAE964C0B57661EB577E7',
   },
+  {
+    operation: 'remainder',
+    a: '0x62a49213a5cd1793cb4518a12ca4fb5f3ab6dbd8b465d0d86975cebda6b6093',
+    b: '0x7fffffffffffffffffffffffffffffff',
+    expected: '0x7ffffffffffffffffffffffffffffffe',
+  },
+  {
+    operation: 'remainder',
+    a: '0x10000000000000000',
+    b: '0x100000001',
+    expected: '0x1',
+  },
 ];
 
 function parse(string) {
