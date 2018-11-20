@@ -1496,7 +1496,7 @@ class JSBI extends Array {
   }
 
   __inplaceSub(subtrahend, startIndex, halfDigits) {
-    let fullSteps = (halfDigits - 1) >>> 1;
+    const fullSteps = (halfDigits - 1) >>> 1;
     let borrow = 0;
     if (startIndex & 1) {
       // this:   [..][..][..]
