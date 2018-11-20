@@ -21,6 +21,8 @@ import JSBI from '../jsbi.mjs';
   const result = JSBI.add(max, other);
   // → 9007199254740993
   console.assert('9007199254740993' === result.toString());
+  // Test `JSBI.toNumber` as well.
+  console.assert(9007199254740993 === JSBI.toNumber(result));
 }
 
 const TESTS = [
