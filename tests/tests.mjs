@@ -30,6 +30,18 @@ const TESTS = [
     b: '-0xF3CF5EDD759DBCC7449962CDB52AE0295BE7306D51555C70',
     expected: '-0x1034209C3C2F251E3F2EF7068FA5CAE964C0B57661EB577E7',
   },
+  { // https://github.com/GoogleChromeLabs/jsbi/pull/14
+    operation: 'remainder',
+    a: '0x62A49213A5CD1793CB4518A12CA4FB5F3AB6DBD8B465D0D86975CEBDA6B6093',
+    b: '0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
+    expected: '0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE',
+  },
+  { // https://github.com/GoogleChromeLabs/jsbi/pull/14#issuecomment-439484605
+    operation: 'remainder',
+    a: '0x10000000000000000',
+    b: '0x100000001',
+    expected: '0x1',
+  },
 ];
 
 function parse(string) {
