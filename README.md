@@ -60,8 +60,8 @@ Most operators are replaced by method calls:
 | Division                    | `c = a / b`    | `c = JSBI.divide(a, b)`           |
 | Remainder                   | `c = a % b`    | `c = JSBI.remainder(a, b)`        |
 | Exponentiation              | `c = a ** b`   | `c = JSBI.exponentiate(a, b)`     |
-| Negation                    | `b = -a`       | `b = JSBI.unaryMinus(a, )`        |
-| Bitwise negation            | `b = ~a`       | `b = JSBI.bitwiseNot(a, )`        |
+| Negation                    | `b = -a`       | `b = JSBI.unaryMinus(a)`          |
+| Bitwise negation            | `b = ~a`       | `b = JSBI.bitwiseNot(a)`          |
 | Left shifting               | `c = a << b`   | `c = JSBI.leftShift(a, b)`        |
 | Right shifting              | `c = a >> b`   | `c = JSBI.signedRightShift(a, b)` |
 | Bitwise “and”               | `c = a & b`    | `c = JSBI.bitwiseAnd(a, b)`       |
