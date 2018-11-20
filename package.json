@@ -10,8 +10,10 @@
   "main": "dist/jsbi-cjs.js",
   "module": "dist/jsbi.mjs",
   "browser": "dist/jsbi-umd.js",
+  "types": "jsbi.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "jsbi.d.ts"
   ],
   "scripts": {
     "build": "rollup --config rollup.config.mjs",
