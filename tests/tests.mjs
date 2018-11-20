@@ -32,9 +32,9 @@ const TESTS = [
   },
   {
     operation: 'remainder',
-    a: '0x62a49213a5cd1793cb4518a12ca4fb5f3ab6dbd8b465d0d86975cebda6b6093',
-    b: '0x7fffffffffffffffffffffffffffffff',
-    expected: '0x7ffffffffffffffffffffffffffffffe',
+    a: '0x62A49213A5CD1793CB4518A12CA4FB5F3AB6DBD8B465D0D86975CEBDA6B6093',
+    b: '0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
+    expected: '0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFE',
   },
   {
     operation: 'remainder',
