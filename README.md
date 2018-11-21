@@ -24,6 +24,8 @@ console.log(String(result));
 
 Note: explicitly call `toString` on any `JSBI` instances when `console.log()`ing them to see their numeric representation (e.g. `String(max)` or `max.toString()`). Without it (e.g. `console.log(max)`), you’ll instead see the object that represents the value.
 
+Use [babel-plugin-transform-jsbi-to-bigint](https://github.com/GoogleChromeLabs/babel-plugin-transform-jsbi-to-bigint) to transpile JSBI code into native BigInt code.
+
 Refer to the detailed instructions below for more information.
 
 ## Why?
@@ -32,7 +34,7 @@ Refer to the detailed instructions below for more information.
 
 To use BigInts in your code today, you need a library. But there’s a difficulty: the BigInt proposal changes the behavior of operators (like `+`, `>=`, etc.) to work on BigInts. These changes are impossible to polyfill directly; and they are also making it infeasible (in most cases) to transpile BigInt code to fallback code using Babel or similar tools. The reason is that such a transpilation would have to replace every single operator in the program with a call to some function that performs type checks on its inputs, which would incur an unacceptable performance penalty.
 
-The solution is to do it the other way round: write code using a library’s syntax, and translate it to native BigInt code when available. JSBI is designed for exactly this purpose: it provides a BigInt “polyfill” implementation that behaves exactly like the upcoming native BigInts, but with a syntax that you can ship on all browsers, today.
+The solution is to do it the other way round: write code using a library’s syntax, and [transpile it to native BigInt code](https://github.com/GoogleChromeLabs/babel-plugin-transform-jsbi-to-bigint) when available. JSBI is designed for exactly this purpose: it provides a BigInt “polyfill” implementation that behaves exactly like the upcoming native BigInts, but with a syntax that you can ship on all browsers, today.
 
 Its advantages over other, existing big-integer libraries are:
 
@@ -103,6 +105,8 @@ It is impossible to replicate the exact behavior of the native `++` and `--` ope
 ## When?
 
 Now! The JSBI library is ready for use today.
+
+Once BigInts are natively supported everywhere, use [babel-plugin-transform-jsbi-to-bigint](https://github.com/GoogleChromeLabs/babel-plugin-transform-jsbi-to-bigint) to transpile your JSBI code into native BigInt code once and for all.
 
 View [our issue tracker](https://github.com/GoogleChromeLabs/jsbi/issues) to learn more about out our future plans for JSBI, and please join the discussion!
 
