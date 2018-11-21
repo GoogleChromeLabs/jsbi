@@ -458,6 +458,70 @@ class JSBI extends Array {
     }
   }
 
+  // DataView polyfills
+  static __makeDataViewSetter(funcName, viewFuncName) {
+    const viewSetFunc = DataView.prototype[`set${viewFuncName}`];
+    if (typeof viewSetFunc === 'undefined') {
+      throw Error('Making DataView setter with invalid view function name.');
+    }
+
+    const fn = function(view, byteOffset, value, littleEndian) {
+      if (value.constructor !== JSBI) {
+        throw TypeError('Value needs to be BigInt ot JSBI');
+      }
+      // Set 64 byte number as two 32 byte numbers.
+      // The lower/higher (depending on endianess)
+      // number has an offset of 4 bytes (32/8).
+      const signBit = value.sign ? (1 << 31) : 0;
+      const lowWord = value.__unsignedDigit(0) - (value.sign ? 1 : 0);
+      viewSetFunc.call( // DataView.set{Int|Uint}32
+        view,
+        littleEndian ? byteOffset : 4 + byteOffset,
+        lowWord, littleEndian
+      );
+      const highWord = (value.__unsignedDigit(1) | signBit) + (value.sign ? 1 : 0);
+      viewSetFunc.call( // DataView.set{Int|Uint}32
+        view,
+        littleEndian ? 4 + byteOffset : byteOffset,
+        highWord, littleEndian
+      );
+    };
+    Object.defineProperty(fn, 'name', {value: funcName});
+    return fn;
+  }
+
+  static __makeDataViewGetter(funcName, viewFuncName) {
+    const viewGetFunc = DataView.prototype[`get${viewFuncName}`];
+    if (typeof viewGetFunc === 'undefined') {
+      throw Error('Making DataView getter with invalid view function name.');
+    }
+
+    const fn = function(view, byteOffset, littleEndian) {
+      // Get 64 byte number as two 32 byte numbers.
+      // The lower/higher (depending on endianess)
+      // number has an offset of 4 bytes (32/8).
+      const lowWord = viewGetFunc.call( // DataView.get{Int|Uint}32
+        view,
+        littleEndian ? byteOffset : 4 + byteOffset,
+        littleEndian
+      );
+      const highWord = viewGetFunc.call( // DataView.get{Int|Uint}32
+        view,
+        littleEndian ? 4 + byteOffset : byteOffset,
+        littleEndian
+      );
+      const sign = highWord < 0;
+      const signBit = sign ? (1 << 31) : 0;
+      const result = new JSBI(2, sign);
+      result.__setDigit(0, (lowWord >>> 0) + (sign ? 1 : 0));
+      result.__setDigit(1, (highWord - (sign ? 1 : 0)) ^ signBit);
+      return result;
+    };
+    Object.defineProperty(fn, 'name', {value: funcName});
+    return fn;
+  }
+
+
   // Helpers.
 
   static __zero() {
@@ -1782,5 +1846,15 @@ JSBI.__kConversionChars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
 JSBI.__kBitConversionBuffer = new ArrayBuffer(8);
 JSBI.__kBitConversionDouble = new Float64Array(JSBI.__kBitConversionBuffer);
 JSBI.__kBitConversionInts = new Int32Array(JSBI.__kBitConversionBuffer);
+
+// DataView polyfills
+JSBI.DataViewSetBigUint64 =
+  JSBI.__makeDataViewSetter('DataViewSetBigUint64', 'Uint32');
+JSBI.DataViewSetBigInt64 =
+  JSBI.__makeDataViewSetter('DataViewSetBigInt64', 'Int32');
+JSBI.DataViewGetBigUint64 =
+  JSBI.__makeDataViewGetter('DataViewGetBigInt64', 'Uint32');
+JSBI.DataViewGetBigInt64 =
+  JSBI.__makeDataViewGetter('DataViewGetBigInt64', 'Int32');
 
 export default JSBI;
