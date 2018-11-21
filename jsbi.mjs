@@ -467,9 +467,9 @@ class JSBI extends Array {
 
     const fn = function(view, byteOffset, value, littleEndian) {
       if (value.constructor !== JSBI) {
-        throw TypeError('Value needs to be BigInt ot JSBI');
+        throw TypeError('Value needs to be JSBI');
       }
-      // Set 64 byte number as two 32 byte numbers.
+      // Set 64 bit number as two 32 bit numbers.
       // The lower/higher (depending on endianess)
       // number has an offset of 4 bytes (32/8).
       const signBit = value.sign ? (1 << 31) : 0;
@@ -497,7 +497,7 @@ class JSBI extends Array {
     }
 
     const fn = function(view, byteOffset, littleEndian) {
-      // Get 64 byte number as two 32 byte numbers.
+      // Get 64 bit number as two 32 bit numbers.
       // The lower/higher (depending on endianess)
       // number has an offset of 4 bytes (32/8).
       const lowWord = viewGetFunc.call( // DataView.get{Int|Uint}32
