@@ -24,7 +24,7 @@ export default [
     ],
     output: [
       // Create a browser-friendly UMD build.
-      { name: 'JSBigInt', file: pkg.browser, format: 'umd' },
+      { name: 'JSBI', file: pkg.browser, format: 'umd' },
       // Create a Node.js-friendly CommonJS build.
       { file: pkg.main, format: 'cjs' },
       // Create a JavaScript module build, for bundlers.
