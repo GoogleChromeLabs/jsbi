@@ -1,6 +1,7 @@
 {
   "name": "jsbi",
   "version": "2.0.5",
+  "repository": "GoogleChromeLabs/jsbi",
   "devDependencies": {
     "eslint": "^5.4.0",
     "eslint-config-google": "^0.9.1",
