@@ -11,6 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import babel from 'rollup-plugin-babel';
 import pkg from './package.json';
 import minify from 'rollup-plugin-babel-minify';
 
@@ -23,12 +24,23 @@ export default [
       }),
     ],
     output: [
-      // Create a browser-friendly UMD build.
-      { name: 'JSBI', file: pkg.browser, format: 'umd' },
       // Create a Node.js-friendly CommonJS build.
       { file: pkg.main, format: 'cjs' },
       // Create a JavaScript module build, for bundlers.
       { file: pkg.module, format: 'es' },
+    ],
+  },
+  {
+    input: 'jsbi.mjs',
+    plugins: [
+      babel(),
+      minify({
+        comments: false,
+      }),
+    ],
+    output: [
+      // Create a browser-friendly UMD build.
+      { name: 'JSBI', file: pkg.browser, format: 'umd' }
     ],
   },
 ];
