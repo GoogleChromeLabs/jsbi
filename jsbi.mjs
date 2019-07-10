@@ -1786,14 +1786,14 @@ class JSBI extends Array {
     return result.__trim();
   }
 
-  static __truncateAndSubFromPowerOfTwo(n, x, result_sign) {
+  static __truncateAndSubFromPowerOfTwo(n, x, resultSign) {
     const neededDigits = (n + 31) >>> 5;
-    const result = new JSBI(neededDigits, result_sign);
+    const result = new JSBI(neededDigits, resultSign);
     let i = 0;
     const last = neededDigits - 1;
     let borrow = 0;
     const limit = Math.min(last, x.length);
-    for(; i < limit; i++) {
+    for (; i < limit; i++) {
       const xDigit = x.__digit(i);
       const rLow = 0 - (xDigit & 0xFFFF) - borrow;
       borrow = (rLow >>> 16) & 1;
@@ -1805,7 +1805,7 @@ class JSBI extends Array {
       result.__setDigit(i, (-borrow) | 0);
     }
     let msd = last < x.length ? x.__digit(last) : 0;
-    let msdBitsConsumed = n & 31;
+    const msdBitsConsumed = n & 31;
     let resultMsd;
     if (msdBitsConsumed === 0) {
       const rLow = 0 - (msd & 0xFFFF) - borrow;
@@ -1813,9 +1813,9 @@ class JSBI extends Array {
       const rHigh = 0 - (msd >>> 16) - borrow;
       resultMsd = (rLow & 0xFFFF) | (rHigh << 16);
     } else {
-      let drop = 32 - msdBitsConsumed;
+      const drop = 32 - msdBitsConsumed;
       msd = (msd << drop) >>> drop;
-      let minuendMsd = 1 << (32 - drop);
+      const minuendMsd = 1 << (32 - drop);
       const rLow = (minuendMsd & 0xFFFF) - (msd & 0xFFFF) - borrow;
       borrow = (rLow >>> 16) & 1;
       const rHigh = (minuendMsd >>> 16) - (msd >>> 16) - borrow;
