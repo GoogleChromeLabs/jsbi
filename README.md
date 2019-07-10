@@ -30,7 +30,7 @@ Refer to the detailed instructions below for more information.
 
 ## Why?
 
-[Native BigInts are already shipping](https://developers.google.com/web/updates/2018/05/bigint) in modern Chromium-based browsers (at the time of this writing, Google Chrome 67+, Opera 54+) and the latest Node.js builds ([v10.4](https://nodejs.org/en/download/releases/) and later), and they are expected to come to other browsers in the future — which means you can't use them yet if you want your code to run everywhere.
+[Native BigInts are already shipping](https://developers.google.com/web/updates/2018/05/bigint) in modern Chromium-based browsers (at the time of this writing, Google Chrome 67+, Opera 54+, Firefox 68+) and the latest Node.js builds ([v10.4](https://nodejs.org/en/download/releases/) and later), and they are expected to come to other browsers in the future — which means you can't use them yet if you want your code to run everywhere.
 
 To use BigInts in your code today, you need a library. But there’s a difficulty: the BigInt proposal changes the behavior of operators (like `+`, `>=`, etc.) to work on BigInts. These changes are impossible to polyfill directly; and they are also making it infeasible (in most cases) to transpile BigInt code to fallback code using Babel or similar tools. The reason is that such a transpilation would have to replace every single operator in the program with a call to some function that performs type checks on its inputs, which would incur an unacceptable performance penalty.
 
@@ -38,7 +38,7 @@ The solution is to do it the other way round: write code using a library’s syn
 
 Its advantages over other, existing big-integer libraries are:
 
-- it behaves exactly like native BigInts will when they become available, so to migrate to those, you can mechanically update your code’s syntax; no re-thinking of its logic will be required. (There is no tool for this migration yet, but it should be easy to build one. Help welcome.)
+- it behaves exactly like native BigInts will when they become available, so to migrate to those, you can [mechanically](https://github.com/GoogleChromeLabs/babel-plugin-transform-jsbi-to-bigint) update your code’s syntax; no re-thinking of its logic will be required.
 - strong focus on performance. On average, JSBI is performance-competitive with the native implementation that Google Chrome is currently shipping.
 
 ## How?
@@ -77,7 +77,7 @@ Most operators are replaced by method calls:
 
 The functions above operate only on BigInts. (They don’t perform type checks in the current implementation, because such checks are a waste of time when we assume that you know what you’re doing. Don’t try to call them with other inputs, or you’ll get “interesting” failures!)
 
-Some operations are particularly interesting when you give them inputs of mixed types, e.g. comparing a BigInt to a Number, or concatenating a string with a BigInt. In order to be symmetric (rather than having to be called on a BigInt as the left-hand side), they are implemented as static functions whose behavior imitates the respective native operands:
+Some operations are particularly interesting when you give them inputs of mixed types, e.g. comparing a BigInt to a Number, or concatenating a string with a BigInt. They are implemented as static functions named after the respective native operators:
 
 | Operation                       | native BigInts | JSBI             |
 | ------------------------------- | -------------- | ---------------- |
