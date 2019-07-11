@@ -45,12 +45,14 @@ Its advantages over other, existing big-integer libraries are:
 
 Except for mechanical differences in syntax, you use JSBI-BigInts just [like you would use native BigInts](https://developers.google.com/web/updates/2018/05/bigint). Some things even look the same, after you replace `BigInt` with `JSBI.BigInt`:
 
-| Operation            | native BigInts      | JSBI                     |
-| -------------------- | ------------------- | ------------------------ |
-| Creation from String | `a = BigInt('456')` | `a = JSBI.BigInt('456')` |
-| Creation from Number | `a = BigInt(789)`   | `a = JSBI.BigInt(789)`   |
-| Conversion to String | `a.toString(radix)` | `a.toString(radix)`      |
-| Conversion to Number | `Number(a)`         | `JSBI.toNumber(a)`       |
+| Operation            | native BigInts          | JSBI                     |
+| -------------------- | ----------------------- | ------------------------ |
+| Creation from String | `a = BigInt('456')`     | `a = JSBI.BigInt('456')` |
+| Creation from Number | `a = BigInt(789)`       | `a = JSBI.BigInt(789)`   |
+| Conversion to String | `a.toString(radix)`     | `a.toString(radix)`      |
+| Conversion to Number | `Number(a)`             | `JSBI.toNumber(a)`       |
+| Truncation           | `BigInt.asIntN(64, a)`  | `JSBI.asIntN(64, a)`     |
+|                      | `BigInt.asUintN(64, a)` | `JSBI.asUintN(64, a)`    |
 
 Most operators are replaced by method calls:
 
