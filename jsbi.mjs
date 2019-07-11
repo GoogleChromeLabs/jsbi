@@ -387,6 +387,56 @@ class JSBI extends Array {
     return JSBI.__absoluteAddOne(result, true, result).__trim();
   }
 
+  static asIntN(n, x) {
+    if (x.length === 0) return x;
+    if (n === 0) return JSBI.__zero();
+    // If {x} has less than {n} bits, return it directly.
+    if (n >= JSBI.__kMaxLengthBits) return x;
+    const neededLength = (n + 31) >>> 5;
+    if (x.length < neededLength) return x;
+    const topDigit = x.__unsignedDigit(neededLength - 1);
+    const compareDigit = 1 << ((n - 1) & 31);
+    if (x.length === neededLength && topDigit < compareDigit) return x;
+    // Otherwise truncate and simulate two's complement.
+    const hasBit = (topDigit & compareDigit) === compareDigit;
+    if (!hasBit) return JSBI.__truncateToNBits(n, x);
+    if (!x.sign) return JSBI.__truncateAndSubFromPowerOfTwo(n, x, true);
+    if ((topDigit & (compareDigit - 1)) === 0) {
+      for (let i = neededLength - 2; i >= 0; i--) {
+        if (x.__digit(i) !== 0) {
+          return JSBI.__truncateAndSubFromPowerOfTwo(n, x, false);
+        }
+      }
+      if (x.length === neededLength && topDigit === compareDigit) return x;
+      return JSBI.__truncateToNBits(n, x);
+    }
+    return JSBI.__truncateAndSubFromPowerOfTwo(n, x, false);
+  }
+
+  static asUintN(n, x) {
+    if (x.length === 0) return x;
+    if (n === 0) return JSBI.__zero();
+    // If {x} is negative, simulate two's complement representation.
+    if (x.sign) {
+      if (n > JSBI.__kMaxLengthBits) {
+        throw new RangeError('BigInt too big');
+      }
+      return JSBI.__truncateAndSubFromPowerOfTwo(n, x, false);
+    }
+    // If {x} is positive and has up to {n} bits, return it directly.
+    if (n >= JSBI.__kMaxLengthBits) return x;
+    const neededLength = (n + 31) >>> 5;
+    if (x.length < neededLength) return x;
+    const bitsInTopDigit = n & 31;
+    if (x.length == neededLength) {
+      if (bitsInTopDigit === 0) return x;
+      const topDigit = x.__digit(neededLength - 1);
+      if ((topDigit >>> bitsInTopDigit) === 0) return x;
+    }
+    // Otherwise, truncate.
+    return JSBI.__truncateToNBits(n, x);
+  }
+
   // Operators.
 
   static ADD(x, y) {
@@ -1718,6 +1768,62 @@ class JSBI extends Array {
 
   static __isBigInt(value) {
     return typeof value === 'object' && value.constructor === JSBI;
+  }
+
+  static __truncateToNBits(n, x) {
+    const neededDigits = (n + 31) >>> 5;
+    const result = new JSBI(neededDigits, x.sign);
+    const last = neededDigits - 1;
+    for (let i = 0; i < last; i++) {
+      result.__setDigit(i, x.__digit(i));
+    }
+    let msd = x.__digit(last);
+    if ((n & 31) !== 0) {
+      const drop = 32 - (n & 31);
+      msd = (msd << drop) >>> drop;
+    }
+    result.__setDigit(last, msd);
+    return result.__trim();
+  }
+
+  static __truncateAndSubFromPowerOfTwo(n, x, resultSign) {
+    const neededDigits = (n + 31) >>> 5;
+    const result = new JSBI(neededDigits, resultSign);
+    let i = 0;
+    const last = neededDigits - 1;
+    let borrow = 0;
+    const limit = Math.min(last, x.length);
+    for (; i < limit; i++) {
+      const xDigit = x.__digit(i);
+      const rLow = 0 - (xDigit & 0xFFFF) - borrow;
+      borrow = (rLow >>> 16) & 1;
+      const rHigh = 0 - (xDigit >>> 16) - borrow;
+      borrow = (rHigh >>> 16) & 1;
+      result.__setDigit(i, (rLow & 0xFFFF) | (rHigh << 16));
+    }
+    for (; i < last; i++) {
+      result.__setDigit(i, (-borrow) | 0);
+    }
+    let msd = last < x.length ? x.__digit(last) : 0;
+    const msdBitsConsumed = n & 31;
+    let resultMsd;
+    if (msdBitsConsumed === 0) {
+      const rLow = 0 - (msd & 0xFFFF) - borrow;
+      borrow = (rLow >>> 16) & 1;
+      const rHigh = 0 - (msd >>> 16) - borrow;
+      resultMsd = (rLow & 0xFFFF) | (rHigh << 16);
+    } else {
+      const drop = 32 - msdBitsConsumed;
+      msd = (msd << drop) >>> drop;
+      const minuendMsd = 1 << (32 - drop);
+      const rLow = (minuendMsd & 0xFFFF) - (msd & 0xFFFF) - borrow;
+      borrow = (rLow >>> 16) & 1;
+      const rHigh = (minuendMsd >>> 16) - (msd >>> 16) - borrow;
+      resultMsd = (rLow & 0xFFFF) | (rHigh << 16);
+      resultMsd &= (minuendMsd - 1);
+    }
+    result.__setDigit(last, resultMsd);
+    return result.__trim();
   }
 
   // Digit helpers.
