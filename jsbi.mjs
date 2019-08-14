@@ -324,7 +324,7 @@ class JSBI extends Array {
     return true;
   }
 
-  static noEqual(x, y) {
+  static notEqual(x, y) {
     return !JSBI.equal(x, y);
   }
 
@@ -512,7 +512,7 @@ class JSBI extends Array {
     }
   }
 
-  static NEQ(x, y) {
+  static NE(x, y) {
     return !JSBI.EQ(x,y)
   }
 
