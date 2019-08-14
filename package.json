@@ -3,12 +3,12 @@
   "version": "3.0.0",
   "repository": "GoogleChromeLabs/jsbi",
   "devDependencies": {
-    "@babel/preset-env": "^7.5.2",
-    "eslint": "^5.4.0",
-    "eslint-config-google": "^0.9.1",
-    "rollup": "^0.65.0",
+    "@babel/preset-env": "^7.5.5",
+    "eslint": "^6.1.0",
+    "eslint-config-google": "^0.13.0",
+    "rollup": "^1.19.4",
     "rollup-plugin-babel": "^4.3.3",
-    "rollup-plugin-babel-minify": "^6.0.0"
+    "rollup-plugin-babel-minify": "^9.0.0"
   },
   "main": "dist/jsbi-cjs.js",
   "module": "dist/jsbi.mjs",
@@ -19,13 +19,14 @@
     "jsbi.d.ts"
   ],
   "scripts": {
-    "build": "rollup --config rollup.config.mjs",
-    "dev": "rollup --config rollup.config.mjs --watch",
+    "build": "rollup --config rollup.config.js",
+    "dev": "rollup --config rollup.config.js --watch",
     "test": "for file in tests/*.mjs; do node --no-warnings --experimental-modules \"${file}\"; done; set -e; for file in benchmarks/*.mjs; do node --no-warnings --experimental-modules \"${file}\"; done",
     "pretest": "npm run build",
     "prepublish": "npm run ci",
     "lint": "eslint --fix jsbi.mjs",
     "generate-benchmarks": "for op in add and div mod mul neg not or sar shl sub xor; do scripts/generate-benchmark.py generate \"${op}\" > \"benchmarks/${op}.mjs\"; done",
-    "ci": "npm run lint && git status && git diff-index --quiet HEAD -- && npm test"
-  }
+    "ci": "npm run lint && npm run build && git status && git diff-index --quiet HEAD -- && npm test"
+  },
+  "dependencies": {}
 }

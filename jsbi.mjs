@@ -1574,7 +1574,7 @@ class JSBI extends Array {
         r0 = (current & 0xFFFF) - subTop - borrow;
         borrow = (r0 >>> 16) & 1;
         this.__setDigit(startIndex + subtrahend.length,
-                        (current & 0xFFFF0000) | (r0 & 0xFFFF));
+            (current & 0xFFFF0000) | (r0 & 0xFFFF));
       }
     } else {
       startIndex >>= 1;
