@@ -78,3 +78,126 @@ for (const test of TESTS) {
     `.trim().replace(/\t/g, '')
   );
 }
+
+// Test Array and DataView polyfills
+{
+  function arrayEqual(a, b) {
+    if (a.length != b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
+
+  function testSet(methodName, number, byteOffset, littleEndian, expected) {
+    const arr = new ArrayBuffer(8 + byteOffset);
+    const view = new DataView(arr);
+    JSBI[`DataViewSet${methodName}`](view, byteOffset, number, littleEndian);
+    const result = new Uint8Array(arr);
+
+    const arr2 = new ArrayBuffer(8 + byteOffset);
+    const view2 = new DataView(arr2);
+    view2[`set${methodName}`](byteOffset, number, littleEndian);
+    const resultNative = new Uint8Array(arr2);
+
+    // test against expected value
+    console.assert(
+      arrayEqual(result, expected),
+      `
+        Unexpected result for DataViewSet${methodName}
+        Expected: ${expected}
+        Expected: ${resultNative} (DataView.set${methodName})
+        Actual:   ${result}
+      `.trim().replace(/\t/g, '')
+    );
+
+  }
+
+  function testGet(methodName, utf8arr, byteOffset, littleEndian, expected) {
+    const view = new DataView(utf8arr.buffer);
+    const result = JSBI[`DataViewGet${methodName}`](view, byteOffset, littleEndian);
+
+    const view2 = new DataView(utf8arr.buffer);
+    const resultNative = JSBI.BigInt(String(view2[`get${methodName}`](byteOffset, littleEndian)));
+
+    // test against expected value
+    console.assert(
+      JSBI.equal(result, expected),
+      `
+        Unexpected result for DataViewGet${methodName}
+        Expected: ${expected}
+        Expected: ${resultNative} (DataView.get${methodName})
+        Actual:   ${result}
+      `.trim().replace(/\t/g, '')
+    );
+
+  }
+
+  testSet(
+    'BigUint64',
+    JSBI.BigInt('9223372036854775807'), // String(2n ** 63n - 1n)
+    0, false,
+    [127, 255, 255, 255, 255, 255, 255, 255]
+  );
+  testSet(
+    'BigUint64',
+    JSBI.BigInt('9223372036854775807'),
+    0, true,
+    [255, 255, 255, 255, 255, 255, 255, 127]
+  );
+  testSet(
+    'BigUint64',
+    JSBI.BigInt('9223372036854775807'),
+    1, false,
+    [0, 127, 255, 255, 255, 255, 255, 255, 255]
+  );
+  testSet(
+    'BigUint64',
+    JSBI.BigInt('9223372036854775807'),
+    1, true,
+    [0, 255, 255, 255, 255, 255, 255, 255, 127]
+  );
+
+  testSet(
+    'BigInt64',
+    JSBI.BigInt('-1152921504606846975'), // - String(2n ** 60n - 1n)
+    0, false,
+    [240, 0, 0, 0, 0, 0, 0, 1]
+  );
+  testSet(
+    'BigInt64',
+    JSBI.BigInt('-1152921504606846975'),
+    0, true,
+    [1, 0, 0, 0, 0, 0, 0, 240]
+  );
+
+  testGet(
+    'BigUint64',
+    new Uint8Array([127, 255, 255, 255, 255, 255, 255, 255]),
+    0, false,
+    JSBI.BigInt('9223372036854775807')
+  );
+
+  testGet(
+    'BigUint64',
+    new Uint8Array([255, 255, 255, 255, 255, 255, 255, 127]),
+    0, true,
+    JSBI.BigInt('9223372036854775807')
+  );
+
+  testGet(
+    'BigInt64',
+    new Uint8Array([192, 0, 0, 0, 0, 0, 0, 1]),
+    0, false,
+    JSBI.BigInt('-4611686018427387903')
+  );
+
+  testGet(
+    'BigInt64',
+    new Uint8Array([1, 0, 0, 0, 0, 0, 0, 192]),
+    0, true,
+    JSBI.BigInt('-4611686018427387903')
+  );
+
+
+}
