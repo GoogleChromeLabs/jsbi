@@ -72,6 +72,7 @@ Most operators are replaced by method calls:
 | Bitwise “or”                | `c = a \| b`   | `c = JSBI.bitwiseOr(a, b)`        |
 | Bitwise “xor”               | `c = a ^ b`    | `c = JSBI.bitwiseXor(a, b)`       |
 | Comparison to other BigInts | `a === b`      | `JSBI.equal(a, b)`                |
+|                             | `a !== b`      | `JSBI.notEqual(a, b)`             |
 |                             | `a < b`        | `JSBI.lessThan(a, b)`             |
 |                             | `a <= b`       | `JSBI.lessThanOrEqual(a, b)`      |
 |                             | `a > b`        | `JSBI.greaterThan(a, b)`          |
@@ -84,6 +85,7 @@ Some operations are particularly interesting when you give them inputs of mixed 
 | Operation                       | native BigInts | JSBI             |
 | ------------------------------- | -------------- | ---------------- |
 | Abstract equality comparison    | `x == y`       | `JSBI.EQ(x, y)`  |
+| Generic “not equal”             | `x != y`       | `JSBI.NE(x, y)`  |
 | Generic “less than”             | `x < y`        | `JSBI.LT(x, y)`  |
 | Generic “less than or equal”    | `x <= y`       | `JSBI.LE(x, y)`  |
 | Generic “greater than”          | `x > y`        | `JSBI.GT(x, y)`  |
