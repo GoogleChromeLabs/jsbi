@@ -1,6 +1,6 @@
 # JSBI — pure-JavaScript BigInts [![Build status](https://travis-ci.com/GoogleChromeLabs/jsbi.svg?branch=master)](https://travis-ci.com/GoogleChromeLabs/jsbi)
 
-JSBI is a pure-JavaScript implementation of [the official ECMAScript BigInt proposal](https://tc39.github.io/proposal-bigint/), which is on track to become a part of the JavaScript language in the near future.
+JSBI is a pure-JavaScript implementation of [the official ECMAScript BigInt proposal](https://tc39.es/proposal-bigint/), which is on track to become a part of the JavaScript language in the near future.
 
 ## Installation
 
