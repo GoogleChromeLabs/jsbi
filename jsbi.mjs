@@ -513,7 +513,7 @@ class JSBI extends Array {
   }
 
   static NE(x, y) {
-    return !JSBI.EQ(x,y)
+    return !JSBI.EQ(x, y);
   }
 
   // Helpers.
