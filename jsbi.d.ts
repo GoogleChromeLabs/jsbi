@@ -25,6 +25,7 @@ export default class JSBI {
   static greaterThan(x: JSBI, y: JSBI): boolean;
   static greaterThanOrEqual(x: JSBI, y: JSBI): boolean;
   static equal(x: JSBI, y: JSBI): boolean;
+  static notEqual(x: JSBI, y: JSBI): boolean;
 
   static bitwiseAnd(x: JSBI, y: JSBI): JSBI;
   static bitwiseXor(x: JSBI, y: JSBI): JSBI;
@@ -36,4 +37,5 @@ export default class JSBI {
   static GT(x: any, y: any): boolean;
   static GE(x: any, y: any): boolean;
   static EQ(x: any, y: any): boolean;
+  static NE(x: any, y: any): boolean;
 }
