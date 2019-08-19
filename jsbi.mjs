@@ -324,6 +324,10 @@ class JSBI extends Array {
     return true;
   }
 
+  static notEqual(x, y) {
+    return !JSBI.equal(x, y);
+  }
+
   static bitwiseAnd(x, y) {
     if (!x.sign && !y.sign) {
       return JSBI.__absoluteAnd(x, y).__trim();
@@ -506,6 +510,10 @@ class JSBI extends Array {
         return x == y;
       }
     }
+  }
+
+  static NE(x, y) {
+    return !JSBI.EQ(x, y);
   }
 
   // Helpers.
