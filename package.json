@@ -4,7 +4,7 @@
   "repository": "GoogleChromeLabs/jsbi",
   "devDependencies": {
     "@babel/preset-env": "^7.5.5",
-    "eslint": "^6.1.0",
+    "eslint": "^6.2.0",
     "eslint-config-google": "^0.13.0",
     "rollup": "^1.19.4",
     "rollup-plugin-babel": "^4.3.3",
