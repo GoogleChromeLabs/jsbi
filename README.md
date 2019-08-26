@@ -53,6 +53,7 @@ Except for mechanical differences in syntax, you use JSBI-BigInts just [like you
 | Conversion to Number | `Number(a)`             | `JSBI.toNumber(a)`       |
 | Truncation           | `BigInt.asIntN(64, a)`  | `JSBI.asIntN(64, a)`     |
 |                      | `BigInt.asUintN(64, a)` | `JSBI.asUintN(64, a)`    |
+| Type check           | `typeof a === 'bigint'` | `a instanceof JSBI`      |
 
 Most operators are replaced by method calls:
 
