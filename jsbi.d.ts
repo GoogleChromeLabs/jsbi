@@ -30,6 +30,9 @@ export default class JSBI {
   static bitwiseAnd(x: JSBI, y: JSBI): JSBI;
   static bitwiseXor(x: JSBI, y: JSBI): JSBI;
   static bitwiseOr(x: JSBI, y: JSBI): JSBI;
+  
+  static asIntN(n: number, x: JSBI): JSBI;
+  static asUintN(n: number, x: JSBI): JSBI;
 
   static ADD(x: any, y: any): any;
   static LT(x: any, y: any): boolean;
