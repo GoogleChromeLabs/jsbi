@@ -28,5 +28,6 @@
     "generate-benchmarks": "for op in add and div mod mul neg not or sar shl sub xor; do scripts/generate-benchmark.py generate \"${op}\" > \"benchmarks/${op}.mjs\"; done",
     "ci": "npm run lint && npm run build && git status && git diff-index --quiet HEAD -- || git diff && npm test"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "license": "Apache-2.0"
 }
