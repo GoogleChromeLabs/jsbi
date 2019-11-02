@@ -46,6 +46,24 @@ const TESTS = [
   },
 ];
 
+// https://github.com/GoogleChromeLabs/jsbi/issues/36
+(function() {
+  const VALID = ['123', ' 123 ', '   123   '];
+  const INVALID = ['x123', 'x 123', ' 123x', '123 x', '123  xx', '123 ?a'];
+  for (const v of VALID) {
+    const result = JSBI.BigInt(v);
+    console.assert(JSBI.equal(result, JSBI.BigInt(123)));
+  }
+  for (const i of INVALID) {
+    try {
+      const result = JSBI.BigInt(i);
+      throw "unreachable";
+    } catch (exception) {
+      console.assert(exception instanceof SyntaxError);
+    }
+  }
+})();
+
 function parse(string) {
   if (string.charCodeAt(0) === 0x2D) { // '-'
     const result = JSBI.BigInt(string.slice(1));

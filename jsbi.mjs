@@ -791,9 +791,12 @@ class JSBI extends Array {
       } while (!done);
     }
 
-    while (cursor !== length) {
+    if (cursor !== length) {
       if (!JSBI.__isWhitespace(current)) return null;
-      current = string.charCodeAt(cursor++);
+      for (cursor++; cursor < length; cursor++) {
+        current = string.charCodeAt(cursor);
+        if (!JSBI.__isWhitespace(current)) return null;
+      }
     }
 
     // Get result.
