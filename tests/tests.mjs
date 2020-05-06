@@ -66,9 +66,7 @@ const TESTS = [
 
 function parse(string) {
   if (string.charCodeAt(0) === 0x2D) { // '-'
-    const result = JSBI.BigInt(string.slice(1));
-    result.sign = true;
-    return result;
+    return JSBI.unaryMinus(JSBI.BigInt(string.slice(1)));
   }
   return JSBI.BigInt(string);
 }
