@@ -1,6 +1,6 @@
 # JSBI — pure-JavaScript BigInts [![Build status](https://travis-ci.com/GoogleChromeLabs/jsbi.svg?branch=master)](https://travis-ci.com/GoogleChromeLabs/jsbi)
 
-JSBI is a pure-JavaScript implementation of [the official ECMAScript BigInt proposal](https://tc39.es/proposal-bigint/), which is on track to become a part of the JavaScript language in the near future.
+JSBI is a pure-JavaScript implementation of [the official ECMAScript BigInt proposal](https://tc39.es/proposal-bigint/), which officially became a part of the JavaScript language in ES2020.
 
 ## Installation
 
@@ -30,7 +30,7 @@ Refer to the detailed instructions below for more information.
 
 ## Why?
 
-[Native BigInts are already shipping](https://developers.google.com/web/updates/2018/05/bigint) in modern Chromium-based browsers (at the time of this writing, Google Chrome 67+, Opera 54+, Firefox 68+) and the latest Node.js builds ([v10.4](https://nodejs.org/en/download/releases/) and later), and they are expected to come to other browsers in the future — which means you can't use them yet if you want your code to run everywhere.
+[Native BigInts are already shipping](https://v8.dev/features/bigint) in modern browsers (at the time of this writing, Google Chrome 67+, Opera 54+, Firefox 68+) and Node.js (v10.4+), and they are expected to come to other browsers in the future — which means you can't use them yet if you want your code to run everywhere.
 
 To use BigInts in your code today, you need a library. But there’s a difficulty: the BigInt proposal changes the behavior of operators (like `+`, `>=`, etc.) to work on BigInts. These changes are impossible to polyfill directly; and they are also making it infeasible (in most cases) to transpile BigInt code to fallback code using Babel or similar tools. The reason is that such a transpilation would have to replace every single operator in the program with a call to some function that performs type checks on its inputs, which would incur an unacceptable performance penalty.
 
