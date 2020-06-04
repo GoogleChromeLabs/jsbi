@@ -1194,9 +1194,11 @@ class JSBI extends Array {
     let carry = true;
     for (let i = 0; i < inputLength; i++) {
       let digit = x.__digit(i);
-      const newCarry = digit === (0xFFFFFFFF | 0);
-      if (carry) digit = (digit + 1) | 0;
-      carry = newCarry;
+      if (carry) {
+        const newCarry = digit === (0xFFFFFFFF | 0);
+        digit = (digit + 1) | 0;
+        carry = newCarry;
+      }
       result.__setDigit(i, digit);
     }
     if (carry) {
@@ -1212,11 +1214,14 @@ class JSBI extends Array {
     let borrow = true;
     for (let i = 0; i < length; i++) {
       let digit = x.__digit(i);
-      const newBorrow = digit === 0;
-      if (borrow) digit = (digit - 1) | 0;
-      borrow = newBorrow;
+      if (borrow) {
+        const newBorrow = digit === 0;
+        digit = (digit - 1) | 0;
+        borrow = newBorrow;
+      }
       result.__setDigit(i, digit);
     }
+    if (borrow) throw new Error('implementation bug');
     for (let i = length; i < resultLength; i++) {
       result.__setDigit(i, 0);
     }
