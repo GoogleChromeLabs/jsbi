@@ -83,7 +83,7 @@ class JSBI extends Array {
       return x.sign ? -value : value;
     }
     const xMsd = x.__digit(xLength - 1);
-    const msdLeadingZeros = Math.clz32(xMsd);
+    const msdLeadingZeros = JSBI.__clz32(xMsd);
     const xBitLength = xLength * 32 - msdLeadingZeros;
     if (xBitLength > 1024) return x.sign ? -Infinity : Infinity;
     let exponent = xBitLength - 1;
@@ -842,7 +842,7 @@ class JSBI extends Array {
     const bitsPerChar = bits;
     const charMask = radix - 1;
     const msd = x.__digit(length - 1);
-    const msdLeadingZeros = Math.clz32(msd);
+    const msdLeadingZeros = JSBI.__clz32(msd);
     const bitLength = length * 32 - msdLeadingZeros;
     let charsRequired =
         ((bitLength + bitsPerChar - 1) / bitsPerChar) | 0;
@@ -887,7 +887,7 @@ class JSBI extends Array {
       }
       return result;
     }
-    const bitLength = length * 32 - Math.clz32(x.__digit(length - 1));
+    const bitLength = length * 32 - JSBI.__clz32(x.__digit(length - 1));
     const maxBitsPerChar = JSBI.__kMaxBitsPerChar[radix];
     const minBitsPerChar = maxBitsPerChar - 1;
     let charsRequired = bitLength * JSBI.__kBitsPerCharTableMultiplier;
@@ -991,7 +991,7 @@ class JSBI extends Array {
     }
     const xLength = x.length;
     let xMsd = x.__digit(xLength - 1);
-    const msdLeadingZeros = Math.clz32(xMsd);
+    const msdLeadingZeros = JSBI.__clz32(xMsd);
     const xBitLength = xLength * 32 - msdLeadingZeros;
     const yBitLength = exponent + 1;
     if (xBitLength < yBitLength) return JSBI.__absoluteLess(xSign);
@@ -1123,7 +1123,7 @@ class JSBI extends Array {
   }
 
   __clzmsd() {
-    return Math.clz32(this[this.length - 1]);
+    return JSBI.__clz32(this[this.length - 1]);
   }
 
   static __absoluteAdd(x, y, resultSign) {
@@ -1371,10 +1371,10 @@ class JSBI extends Array {
       const m1 = multiplicand.__digit(i);
       const m1Low = m1 & 0xFFFF;
       const m1High = m1 >>> 16;
-      const rLow = Math.imul(m1Low, m2Low);
-      const rMid1 = Math.imul(m1Low, m2High);
-      const rMid2 = Math.imul(m1High, m2Low);
-      const rHigh = Math.imul(m1High, m2High);
+      const rLow = JSBI.__imul(m1Low, m2Low);
+      const rMid1 = JSBI.__imul(m1Low, m2High);
+      const rMid2 = JSBI.__imul(m1High, m2Low);
+      const rHigh = JSBI.__imul(m1High, m2High);
       accLow += highLower + (rLow & 0xFFFF);
       accHigh += highHigher + carry + (accLow >>> 16) + (rLow >>> 16) +
                  (rMid1 & 0xFFFF) + (rMid2 & 0xFFFF);
@@ -1404,10 +1404,10 @@ class JSBI extends Array {
     let high = 0;
     for (let i = 0; i < n; i++) {
       const digit = source.__digit(i);
-      const rx = Math.imul(digit & 0xFFFF, factor);
+      const rx = JSBI.__imul(digit & 0xFFFF, factor);
       const r0 = (rx & 0xFFFF) + high + carry;
       carry = r0 >>> 16;
-      const ry = Math.imul(digit >>> 16, factor);
+      const ry = JSBI.__imul(digit >>> 16, factor);
       const r16 = (ry & 0xFFFF) + (rx >>> 16) + carry;
       carry = r16 >>> 16;
       high = ry >>> 16;
@@ -1434,10 +1434,10 @@ class JSBI extends Array {
       const d = this.__digit(i);
       const dLow = d & 0xFFFF;
       const dHigh = d >>> 16;
-      const pLow = Math.imul(dLow, mLow);
-      const pMid1 = Math.imul(dLow, mHigh);
-      const pMid2 = Math.imul(dHigh, mLow);
-      const pHigh = Math.imul(dHigh, mHigh);
+      const pLow = JSBI.__imul(dLow, mLow);
+      const pMid1 = JSBI.__imul(dLow, mHigh);
+      const pMid2 = JSBI.__imul(dHigh, mLow);
+      const pHigh = JSBI.__imul(dHigh, mHigh);
       const rLow = highLower + (pLow & 0xFFFF);
       const rHigh = highHigher + carry + (rLow >>> 16) + (pLow >>> 16) +
                     (pMid1 & 0xFFFF) + (pMid2 & 0xFFFF);
@@ -1508,7 +1508,7 @@ class JSBI extends Array {
         let rhat = (input % vn1) | 0;
         const vn2 = divisor.__halfDigit(n - 2);
         const ujn2 = u.__halfDigit(j + n - 2);
-        while ((Math.imul(qhat, vn2) >>> 0) > (((rhat << 16) | ujn2) >>> 0)) {
+        while ((JSBI.__imul(qhat, vn2) >>> 0) > (((rhat << 16) | ujn2) >>> 0)) {
           qhat--;
           rhat += vn1;
           if (rhat > 0xFFFF) break;
@@ -1541,7 +1541,7 @@ class JSBI extends Array {
   }
 
   static __clz16(value) {
-    return Math.clz32(value) - 16;
+    return JSBI.__clz32(value) - 16;
   }
 
   // TODO: work on full digits, like __inplaceSub?
@@ -1904,5 +1904,14 @@ JSBI.__kConversionChars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
 JSBI.__kBitConversionBuffer = new ArrayBuffer(8);
 JSBI.__kBitConversionDouble = new Float64Array(JSBI.__kBitConversionBuffer);
 JSBI.__kBitConversionInts = new Int32Array(JSBI.__kBitConversionBuffer);
+
+// For IE11 compatibility.
+JSBI.__clz32 = Math.clz32 || function(x) {
+  if (x === 0) return 32;
+  return 31 - (Math.log(x >>> 0) / Math.LN2 | 0) | 0;
+};
+JSBI.__imul = Math.imul || function(a, b) {
+  return (a * b) | 0;
+};
 
 export default JSBI;
