@@ -1906,6 +1906,8 @@ JSBI.__kBitConversionDouble = new Float64Array(JSBI.__kBitConversionBuffer);
 JSBI.__kBitConversionInts = new Int32Array(JSBI.__kBitConversionBuffer);
 
 // For IE11 compatibility.
+// Note that the custom replacements are tailored for JSBI's needs, and as
+// such are not reusable as general-purpose polyfills.
 JSBI.__clz32 = Math.clz32 || function(x) {
   if (x === 0) return 32;
   return 31 - (Math.log(x >>> 0) / Math.LN2 | 0) | 0;
