@@ -56,6 +56,11 @@ const TESTS = [
     b: '-0b1111111111111111111111111111111111111111111111111111111111111111',
     expected: '-0b1111111111111111111111111111111111111111111111111111111111111111',
   },
+  {
+    operation: 'square',
+    a: '2',
+    expected: '4',
+  }
 ];
 
 // https://github.com/GoogleChromeLabs/jsbi/issues/36

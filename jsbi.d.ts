@@ -11,6 +11,12 @@ export default class JSBI {
   static unaryMinus(x: JSBI): JSBI;
   static bitwiseNot(x: JSBI): JSBI;
 
+  // test
+  static square(x: JSBI): JSBI;
+
+
+
+
   static exponentiate(x: JSBI, y: JSBI): JSBI;
   static multiply(x: JSBI, y: JSBI): JSBI;
   static divide(x: JSBI, y: JSBI): JSBI;

@@ -219,6 +219,18 @@ class JSBI extends Array {
     return result.__trim();
   }
 
+  // Test square
+  static square(x) {
+    if (x.length === 0) return x;
+    const resultLength = (x.length << 1) +1;
+
+    const result = new JSBI(resultLength, 0);
+    result.__initializeDigits();
+    result = JSBI.__squareAccumulate(x, result);
+    return result.__trim();
+  }
+
+
   static divide(x, y) {
     if (y.length === 0) throw new RangeError('Division by zero');
     if (JSBI.__absoluteCompare(x, y) < 0) return JSBI.__zero();
@@ -1355,6 +1367,81 @@ class JSBI extends Array {
     if (i < 0) return 0;
     return x.__unsignedDigit(i) > y.__unsignedDigit(i) ? 1 : -1;
   }
+
+  // improve square
+  static __squareAccumulate(a, out) {
+    if (a.length === 1 && a[0] === 0) {
+      const result = new JSBI( 0, 0 );
+      return result;
+    }
+    let ncarry = 0;
+    let nncarry = 0;
+    let temp;
+    let carry = 0;
+    let iWord;
+    const upperBd = out.length;
+    // var carryNow = 0;
+    // var carryNext = 0;
+    for (let i =0; i < upperBd; i++) {
+      // normalize
+      iWord = (carry +(out[i] & 0xFFFF))| 0;
+      ncarry += (iWord >>> 16) | 0;
+      iWord &= 0xFFFF;
+
+      nncarry = (ncarry >>> 16) | 0;
+      ncarry &=0xFFFF;
+
+      // fix index degree i, the coefficient is 2*(a0*ai+a1*ai-1+.)+a(i/2)^2
+      for (let j =0; j < ((i+1)>>1); j++) {
+        if (j < a.length && i-j <= a.length ) {
+          temp = (a[j] |0 )* (a[i-j]|0 );
+          let tempCarry = (temp >> 16);
+          let tempWord =temp & 0xFFFF;
+
+
+          tempWord += temp;
+          tempCarry += (tempWord >> 16);
+          tempWord = tempWord & 0xFFFF;
+
+          nncarry += tempCarry >> 16;
+          tempCarry &= 0xFFFF;
+
+          iWord += tempWord;
+          ncarry += iWord >> 16;
+          iWord &= 0xFFFF;
+
+          nncarry += (ncarry >> 16);
+          ncarry &=0xFFFF;
+        }
+      }
+      if ((i & 1) !== 1 ) {
+        const index = i >> 1;
+
+        let tempWord = (a[index] |0)*(a[index] | 0);
+        const tempCarry = tempWord >> 16;
+        tempWord &=0xFFFF;
+
+        iWord += tempWord;
+        ncarry += iWord >> 16;
+        iWord &= 0xFFFF;
+
+        // check ncarry -> nncarry
+        nncarry += (ncarry >>> 16) | 0;
+        ncarry &=0xFFFF;
+      }
+      out[i] = iWord;
+      carry = ncarry;
+      ncarry = nncarry;
+    }
+    if (carry != 0 ) {
+      out.push(carry);
+    }
+    if (ncarry != 0 ) {
+      out.push(ncarry);
+    }
+    return out;
+  }
+
 
   static __multiplyAccumulate(multiplicand, multiplier, accumulator,
       accumulatorIndex) {
