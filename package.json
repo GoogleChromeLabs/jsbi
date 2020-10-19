@@ -21,7 +21,9 @@
   "scripts": {
     "build": "rollup --config rollup.config.js",
     "dev": "rollup --config rollup.config.js --watch",
-    "test": "for file in tests/*.mjs; do node --no-warnings --experimental-modules \"${file}\"; done; set -e; for file in benchmarks/*.mjs; do node --no-warnings --experimental-modules \"${file}\"; done",
+    "test": "test:unit && test:benchmark",
+    "test:unit": "for file in tests/*.mjs; do node --no-warnings --experimental-modules \"${file}\"; done;",
+    "test:benchmark": "set -e; for file in benchmarks/*.mjs; do node --no-warnings --experimental-modules \"${file}\"; done",
     "pretest": "npm run build",
     "prepublish": "npm run ci",
     "lint": "eslint --fix jsbi.mjs",

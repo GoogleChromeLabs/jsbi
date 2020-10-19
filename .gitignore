@@ -1,8 +1,9 @@
 dist
 
-# Installed npm modules
+# Installed npm or yarn modules
 node_modules
 package-lock.json
+yarn.lock
 
 # Folder view configuration files
 .DS_Store
