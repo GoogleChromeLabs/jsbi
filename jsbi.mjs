@@ -1786,7 +1786,7 @@ static euclidUpdate(A, B, Ua, Ub, q, r, s, t, extended) {
     var windowSize = 6;
     var wnd = new Array(1 << windowSize);
     wnd[0] = JSBI.BigInt(1);
-    wnd[1] = JSBI.clone(x);
+    wnd[1] = x;
     for (var i = 2; i < wnd.length; i++) {
       wnd[i] = JSBI.multiply(wnd[i - 1], x);
       wnd[i] = JSBI.remainder(wnd[i], m);
