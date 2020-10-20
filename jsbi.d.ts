@@ -13,10 +13,13 @@ export default class JSBI {
 
   // test
   static square(x: JSBI): JSBI;
+  static powMod(x: JSBI, y: JSBI, m:JSBI): JSBI;
 
+  static powTwo(x: JSBI, m :JSBI): JSBI;
+  static bitLength(x:JSBI): JSBI;
+  static modInverse(x: JSBI, m :JSBI): JSBI;
 
-
-
+  //
   static exponentiate(x: JSBI, y: JSBI): JSBI;
   static multiply(x: JSBI, y: JSBI): JSBI;
   static divide(x: JSBI, y: JSBI): JSBI;

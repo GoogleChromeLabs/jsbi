@@ -221,14 +221,409 @@ class JSBI extends Array {
 
   // Test square
   static square(x) {
-    if (x.length === 0) return x;
-    const resultLength = (x.length << 1) +1;
-
-    const result = new JSBI(resultLength, 0);
-    result.__initializeDigits();
-    result = JSBI.__squareAccumulate(x, result);
-    return result.__trim();
+    return JSBI.multiply(x,x);
   }
+
+  // ModInverse
+  // ModInverse sets z to the multiplicative inverse of g in the ring ℤ/nℤ
+  // and returns z. If g and n are not relatively prime, g has no multiplicative
+  // inverse in the ring ℤ/nℤ.  In this case, z is unchanged and the return value
+  // is nil.
+static modInverse(z, n) {
+	// GCD expects parameters a and b to be > 0.
+	// if (n.negative {
+	// 	var n2 Int
+	// 	n = n2.Neg(n)
+	// }
+	// if g.neg {
+	// 	var g2 Int
+	// 	g = g2.Mod(g, n)
+  // }
+  let x = 0;
+  let y= 0;
+  // console.log("zBefore:",z);
+  // z =  JSBI.transferToUint(z);
+  // console.log("zAfter:",z);
+  
+  // n = JSBI.transferToUint(n); 
+  // console.log("n:",n);
+  // let p = JSBI.BigInt(Uint32Array.from(z));
+  // let q = JSBI.BigInt(Uint32Array.from(n));
+  // z[0] = p[0];
+	let result =  JSBI.lehmerGCD(x,y,z,n);
+
+	// if and only if d==1, g and n are relatively prime
+	if (JSBI.NE(result.z, 1)) {
+		//throw new Error('GCD('+z+','+n+')='+result.z);
+	}
+	// but it may be negative, so convert to the range 0 <= z < |n|
+	if (result.inverse.sign) {
+    return JSBI.add(n, result.inverse);
+	}
+	return result.inverse;
+}	// x and y are such that g*x + n*y = 1, therefore x is the inverse element,
+
+
+static transferToUint(x) {
+  let result = new JSBI(x.length -1, x.sign);
+  let temp = Uint32Array.from(x);
+  for (let i=0; i < x.length; i++) {
+    result[i] = temp[i];
+  }
+  return result;
+
+  result.__absoluteAdd
+}
+
+static exchange(A, B) {
+  A = JSBI.bitwiseXor(A,B);
+  B = JSBI.bitwiseXor(A, B);
+  A = JSBI.bitwiseXor(A,B);
+
+  return {
+    A: A,
+    B: B,
+  };
+}
+
+//   // lehmerGCD sets z to the greatest common divisor of a and b,
+// // which both must be > 0, and returns z.
+// // If x or y are not nil, their values are set such that z = a*x + b*y.
+// // See Knuth, The Art of Computer Programming, Vol. 2, Section 4.5.2, Algorithm L.
+// // This implementation uses the improved condition by Collins requiring only one
+// // quotient and avoiding the possibility of single Word overflow.
+// // See Jebelean, "Improving the multiprecision Euclidean algorithm",
+// // Design and Implementation of Symbolic Computation Systems, pp 45-58.
+// // The cosequences are updated according to Algorithm 10.45 from
+// // Cohen et al. "Handbook of Elliptic and Hyperelliptic Curve Cryptography" pp 192.
+static lehmerGCD(x, y, a, b)  {
+	//var A, B, Ua, Ub *Int
+
+  let Ua, Ub;
+  let A = JSBI.BigInt(a);
+  let B = JSBI.BigInt(b);
+
+  
+  
+
+	let extended = (x !== null || y !== null);
+
+	if (extended) {
+		// Ua (Ub) tracks how many times input a has been accumulated into A (B).
+		Ua = JSBI.BigInt(1);
+		Ub = JSBI.BigInt(0);
+	}
+
+  // temp variables for multiprecision update
+  let q,s, t;
+  let r = JSBI.BigInt(0);
+  // ensure A >= B
+
+	if (JSBI.LT(A, B)) {
+    let change = JSBI.exchange(A,B);
+    A = change.A;
+    B = change.B;
+
+    change = JSBI.exchange(Ua,Ub);
+    Ua = change.A;
+    Ub = change.B;
+  }
+  
+  let u0, u1, v0, v1, even;
+  // loop invariant A >= B
+	while (B.length > 1) {
+
+    // console.log("B.length:", B.length);
+		// Attempt to calculate in single-precision using leading words of A and B.
+    let computingResult = JSBI.lehmerSimulate(A, B)
+    u0 = computingResult.u0;
+    u1 = computingResult.u1;
+    v0 = computingResult.v0;
+    v1 = computingResult.v1;
+    even = computingResult.even;
+
+		// multiprecision Step
+		if (JSBI.NE(v0,0)) {
+			// Simulate the effect of the single-precision steps using the cosequences.
+			// A = u0*A + v0*B
+			// B = u1*A + v1*B
+      let computingResult = JSBI.lehmerUpdate(A, B, q, s, t, u0, u1, v0, v1, even);
+      A = computingResult.A;
+      B= computingResult.B;
+      q = computingResult.q;
+      r = computingResult.r;
+      s = computingResult.s;
+      t = computingResult.t;
+
+			if (extended) {
+				// Ua = u0*Ua + v0*Ub
+				// Ub = u1*Ua + v1*Ub
+        let computingResult =JSBI.lehmerUpdate(Ua, Ub, q, s, t, u0, u1, v0, v1, even);
+        A = computingResult.A;
+        B= computingResult.B;
+        q = computingResult.q;
+        r = computingResult.r;
+        s = computingResult.s;
+        t = computingResult.t;
+			}
+
+		} else {
+			// Single-digit calculations failed to simulate any quotients.
+			// Do a standard Euclidean step.
+      let computingResult = JSBI.euclidUpdate(A, B, Ua, Ub, q, r, s, t, extended);
+      A = computingResult.A;
+      B= computingResult.B;
+      q = computingResult.q;
+      r = computingResult.r;
+      s = computingResult.s;
+      t = computingResult.t;
+      Ua = computingResult.Ua;
+      Ub = computingResult.Ub;
+    }
+  }
+	if (B.length > 0) {
+		// extended Euclidean algorithm base case if B is a single Word
+		if (A.length > 1) {
+      console.log("ALength:", A.length);
+			// A is longer than a single Word, so one update is needed.
+     let computingResult = JSBI.euclidUpdate(A, B, Ua, Ub, q, r, s, t, extended);
+      A = computingResult.A;
+      B= computingResult.B;
+      q = computingResult.q;
+      r = computingResult.r;
+      s = computingResult.s;
+      t = computingResult.t;
+      Ua = computingResult.Ua;
+      Ub = computingResult.Ub;
+		}
+		if (B.length > 0) {
+      // A and B are both a single Word.
+      let tempA = JSBI.transferToUint(A);
+      let tempB = JSBI.transferToUint(B);
+
+      let aWord = tempA[0];
+      let bWord = tempB[0];
+
+			if (extended) {			
+        let ua= 1;
+        let ub = 0;
+        let va= 0;
+        let vb = 1;
+        even = true;
+        let temp;
+				while ( bWord !== 0) {
+          let q = (aWord / bWord) | 0;
+          let r = aWord%bWord;
+          aWord = bWord;
+          bWord = r;
+          temp = ua;
+          ua = ub;
+          ub = temp + q*ub;
+          temp = va;
+          va = vb;
+          vb = temp+q*vb;
+				
+					even = (~even);
+				}
+        t = JSBI.BigInt(ua);
+        s = JSBI.BigInt(va);
+        t.sign = ~even;
+        s.sign = (even);
+
+        t = JSBI.multiply(t,Ua);
+        s = JSBI.multiply(s,Ub);
+
+
+				Ua = JSBI.add(s,t);
+			} else {
+				while( bWord !== 0) {
+          temp = aWord;
+          aWord = bWord;
+          bWord = temp % bWord;
+				}
+      }
+      A[0] = aWord;
+		}
+  }
+  
+	return {
+    z: A,
+    inverse: Ua,
+  };
+}
+
+// lehmerSimulate attempts to simulate several Euclidean update steps
+// using the leading digits of A and B.  It returns u0, u1, v0, v1
+// such that A and B can be updated as:
+//		A = u0*A + v0*B
+//		B = u1*A + v1*B
+// Requirements: A >= B and len(B.abs) >= 2
+// Since we are calculating with full words to avoid overflow,
+// we use 'even' to track the sign of the cosequences.
+// For even iterations: u0, v1 >= 0 && u1, v0 <= 0
+// For odd  iterations: u0, v1 <= 0 && u1, v0 >= 0
+static lehmerSimulate(A, B)  {
+	// initialize the digits
+	let a1, a2;
+
+	let m = B.length; // m >= 2
+	let n = A.length; // n >= m >= 2
+
+  // extract the top Word of bits from A and B
+  
+  
+  let h = JSBI.LeadingZeros(A[n-1]);
+  
+
+
+	a1 = (A[n-1]<<h) | (A[n-2]>>(32-h));
+	// B may have implicit zero words in the high bits if the lengths differ
+	switch(n) {
+	case m:
+		a2 = B[n-1]<<h | B[n-2]>>(32-h);
+	case m+1:
+		a2 = B[n-2] >> (32 - h);
+	default:
+		a2 = 0;
+	}
+
+	// Since we are calculating with full words to avoid overflow,
+	// we use 'even' to track the sign of the cosequences.
+	// For even iterations: u0, v1 >= 0 && u1, v0 <= 0
+	// For odd  iterations: u0, v1 <= 0 && u1, v0 >= 0
+	// The first iteration starts with k=1 (odd).
+	let even = false
+	// variables to track the cosequences
+  let u0 = 0;
+  let u1 = 1;
+  let u2 = 0;
+
+  let v0 = 0;
+  let v1 = 0;
+  let v2 = 1;
+
+  let temp =0;
+
+	// Calculate the quotient and cosequences using Collins' stopping condition.
+	// Note that overflow of a Word is not possible when computing the remainder
+	// sequence and cosequences since the cosequence size is bounded by the input size.
+	// See section 4.2 of Jebelean for details.
+	while (a2 >= v2 && a1-a2 >= v1+v2) {
+    q = a1 / a2;
+    r = a1 % a2;
+
+
+    a1 = a2;
+    a2 = r;
+
+    temp = u1;
+    u0 = u1;
+    u1 = u2;
+    u2 = temp +q*u2;
+
+    temp =v1;
+    v0 = v1;
+    v1 = v2;
+    v2 = temp+q*v2;
+		even = !even
+	}
+	return {
+    u0: u0,
+    u1: u1,
+    v0: v0,
+    v1: v1,
+    even: even,
+  };
+}
+
+
+
+static LeadingZeros(x) {
+  let y = JSBI.BigInt(x);
+  const xLength = y.length;
+  if (xLength === 0) return 0;
+  const xMsd = y.__digit(xLength - 1);
+  return JSBI.__clz32(xMsd);
+}
+
+// lehmerUpdate updates the inputs A and B such that:
+//		A = u0*A + v0*B
+//		B = u1*A + v1*B
+// where the signs of u0, u1, v0, v1 are given by even
+// For even == true: u0, v1 >= 0 && u1, v0 <= 0
+// For even == false: u0, v1 <= 0 && u1, v0 >= 0
+// q, r, s, t are temporary variables to avoid allocations in the multiplication
+static lehmerUpdate(A, B, q, s, t, u0, u1, v0, v1, even) {
+  t = JSBI.BigInt(u0);
+  s = JSBI.BigInt(v0);
+  t.sign = !even;
+  s.sign = even;
+
+  t = JSBI.multiply(t,A);
+  s = JSBI.multiply(s,B);
+
+  let r = JSBI.BigInt(u1);
+  q = JSBI.BigInt(v1);
+  r.sign = even;
+  q.sign = !even;
+
+  r = JSBI.multiply(r,A);
+  q = JSBI.multiply(q,B);
+
+  A = JSBI.add(s,A);
+  B = JSBI.add(r,q);
+
+  return {
+    A: A,
+    B: B,
+    q: q,
+    r: r,
+    s: s,
+    t: t,
+  }
+}
+ 
+// euclidUpdate performs a single step of the Euclidean GCD algorithm
+// if extended is true, it also updates the cosequence Ua, Ub
+static euclidUpdate(A, B, Ua, Ub, q, r, s, t, extended) {
+  q = JSBI.divide(A,B);
+  r = JSBI.subtract(A, JSBI.multiply(B,q));
+  
+  //let result = QuoRem(A, B, r);
+  
+  //console.log("r:",r);
+  let temp = A;
+  A = B;
+  B = r;
+  //B= result.r;
+  r = temp;
+
+	if (extended) {
+		// Ua, Ub = Ub, Ua - q*Ub
+    t = JSBI.BigInt(Ub);
+    s = JSBI.multiply(Ub,q); 
+    //s = Ub.mul(result.q);
+    Ub = JSBI.subtract(Ua,s);
+    Ua = JSBI.BigInt(t);
+  }
+  return {
+    A: A,
+    B: B,
+    Ua: Ua,
+    Ub: Ub,
+    q: q,
+    r: r,
+    s: s,
+    t: t,
+  }
+}
+
+
+
+
+
+
+
 
 
   static divide(x, y) {
@@ -1368,80 +1763,119 @@ class JSBI extends Array {
     return x.__unsignedDigit(i) > y.__unsignedDigit(i) ? 1 : -1;
   }
 
-  // improve square
-  static __squareAccumulate(a, out) {
-    if (a.length === 1 && a[0] === 0) {
-      const result = new JSBI( 0, 0 );
-      return result;
-    }
-    let ncarry = 0;
-    let nncarry = 0;
-    let temp;
-    let carry = 0;
-    let iWord;
-    const upperBd = out.length;
-    // var carryNow = 0;
-    // var carryNext = 0;
-    for (let i =0; i < upperBd; i++) {
-      // normalize
-      iWord = (carry +(out[i] & 0xFFFF))| 0;
-      ncarry += (iWord >>> 16) | 0;
-      iWord &= 0xFFFF;
-
-      nncarry = (ncarry >>> 16) | 0;
-      ncarry &=0xFFFF;
-
-      // fix index degree i, the coefficient is 2*(a0*ai+a1*ai-1+.)+a(i/2)^2
-      for (let j =0; j < ((i+1)>>1); j++) {
-        if (j < a.length && i-j <= a.length ) {
-          temp = (a[j] |0 )* (a[i-j]|0 );
-          let tempCarry = (temp >> 16);
-          let tempWord =temp & 0xFFFF;
-
-
-          tempWord += temp;
-          tempCarry += (tempWord >> 16);
-          tempWord = tempWord & 0xFFFF;
-
-          nncarry += tempCarry >> 16;
-          tempCarry &= 0xFFFF;
-
-          iWord += tempWord;
-          ncarry += iWord >> 16;
-          iWord &= 0xFFFF;
-
-          nncarry += (ncarry >> 16);
-          ncarry &=0xFFFF;
-        }
-      }
-      if ((i & 1) !== 1 ) {
-        const index = i >> 1;
-
-        let tempWord = (a[index] |0)*(a[index] | 0);
-        const tempCarry = tempWord >> 16;
-        tempWord &=0xFFFF;
-
-        iWord += tempWord;
-        ncarry += iWord >> 16;
-        iWord &= 0xFFFF;
-
-        // check ncarry -> nncarry
-        nncarry += (ncarry >>> 16) | 0;
-        ncarry &=0xFFFF;
-      }
-      out[i] = iWord;
-      carry = ncarry;
-      ncarry = nncarry;
-    }
-    if (carry != 0 ) {
-      out.push(carry);
-    }
-    if (ncarry != 0 ) {
-      out.push(ncarry);
-    }
-    return out;
+  static bitLength(x) {
+    const xLength = x.length;
+    if (xLength === 0) return 0;
+    const xMsd = x.__digit(xLength - 1);
+    const msdLeadingZeros = JSBI.__clz32(xMsd);
+    return xLength * 32 - msdLeadingZeros;
   }
 
+  static clone(x) {
+    let result = new JSBI(x.length, x.sign);
+    for(let i =0; i < x.length; i+=1) {
+      result[i] = x[i];
+    }
+    return result;
+  } 
+
+
+  static powMod (x, a, m) {
+    if (JSBI.EQ(a, 0)) return JSBI.BigInt(1);
+
+    var windowSize = 8;
+    var wnd = new Array(1 << windowSize);
+    wnd[0] = JSBI.BigInt(1);
+    wnd[1] = JSBI.clone(x);
+    for (var i = 2; i < wnd.length; i++) {
+      wnd[i] = JSBI.multiply(wnd[i - 1], x);
+      wnd[i] = JSBI.remainder(wnd[i], m);
+    }
+
+    var res = wnd[0];
+    var current = 0;
+    var currentLen = 0;
+    var start = (JSBI.bitLength(a) | 0) % 32;
+    if (start === 0) {
+      start = 32;
+    }
+
+    for (i = a.length - 1; i >= 0; i--) {
+      var word = a[i];
+      for (var j = start - 1; j >= 0; j--) {
+        var bit = (word >> j) & 1;
+        if (JSBI.NE(res,wnd[0])) {
+          res = JSBI.square(res);
+          res = JSBI.remainder(res, m);
+        }
+
+        if (bit === 0 && current === 0) {
+          currentLen = 0;
+          continue;
+        }
+
+        current <<= 1;
+        current |= bit;
+        currentLen++;
+        if (currentLen !== windowSize && (i !== 0 || j !== 0)) continue;
+
+        res = JSBI.multiply(res,wnd[current]);
+        res = JSBI.remainder(res, m);
+        currentLen = 0;
+        current = 0;
+      }
+      start = 32;
+    }
+    return res;
+  };
+
+
+
+  static powTwo (num, m) {
+    if (JSBI.EQ(num, 0)) return new JSBI.BigInt(0);
+    if (JSBI.EQ(num, 1)) return new JSBI.BigInt(2);
+
+    var windowSize = 1;
+
+    //const BN1 = new BigInt(1);
+    var res = new JSBI(1, 0);
+    res[0] = 1;
+    var current = 0;
+    var currentLen = 0;
+    var start = 4 % 32;
+    if (start === 0) {
+      start = 32;
+    }
+
+    for (var i = num.length - 1; i >= 0; i--) {
+      var word = num[i];
+      for (var j = start - 1; j >= 0; j--) {
+        var bit = (word >> j) & 1;
+        if ( JSBI.NE(res, 1) ) {
+          res = JSBI.square(res);
+          res = JSBI.remainder(res, m);
+        }
+
+        if (bit === 0 && current === 0) {
+          currentLen = 0;
+          continue;
+        }
+
+        current <<= 1;
+        current |= bit;
+        currentLen++;
+        if (currentLen !== windowSize && (i !== 0 || j !== 0)) continue;
+
+        res = JSBI.leftShift(res, current);
+        res = JSBI.remainder(res, m);
+        currentLen = 0;
+        current = 0;
+      }
+      start = 32;
+    }
+    res = JSBI.remainder(res, m);
+    return res;
+  };
 
   static __multiplyAccumulate(multiplicand, multiplier, accumulator,
       accumulatorIndex) {
