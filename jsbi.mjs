@@ -395,11 +395,14 @@ static lehmerGCD(x, y, a, b)  {
 		}
 		if (B.length > 0) {
       // A and B are both a single Word.
-      let tempA = JSBI.transferToUint(A);
-      let tempB = JSBI.transferToUint(B);
-
-      let aWord = tempA[0];
-      let bWord = tempB[0];
+      let aWord = A[0];
+      let bWord = B[0];
+      if (aWord < 0) {
+        aWord += 4294967296;
+      }
+      if (bWord < 0) {
+        bWord += 4294967296;
+      }
 
 			if (extended) {			
         let ua= 1;
