@@ -1783,7 +1783,7 @@ class JSBI extends Array {
   }
 
   static __isBigInt(value) {
-    return typeof value === 'object' && value.constructor === JSBI;
+    return typeof value === 'object' && value !== null && value.constructor === JSBI;
   }
 
   static __truncateToNBits(n, x) {
