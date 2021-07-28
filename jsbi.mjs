@@ -1720,6 +1720,8 @@ class JSBI extends Array {
     }
     let result = new JSBI(resultLength, sign);
     if (bitsShift === 0) {
+      // Zero out any overflow digit (see "roundingCanOverflow" above).
+      result.__setDigit(resultLength - 1, 0);
       for (let i = digitShift; i < length; i++) {
         result.__setDigit(i - digitShift, x.__digit(i));
       }
