@@ -158,7 +158,7 @@ A more vague future plan is to use the JSBI library (or an extension to it) as a
 1. Push the release commit and tag:
 
     ```sh
-    git push
+    git push && git push --tags
     ```
 
     Our CI then automatically publishes the new release to npm.
