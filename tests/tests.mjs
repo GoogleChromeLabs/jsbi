@@ -56,6 +56,12 @@ const TESTS = [
     b: '-0b1111111111111111111111111111111111111111111111111111111111111111',
     expected: '-0b1111111111111111111111111111111111111111111111111111111111111111',
   },
+  {  // https://github.com/GoogleChromeLabs/jsbi/issues/57
+    operation: 'signedRightShift',
+    a: '-0xFFFFFFFFFFFFFFFF',
+    b: '32',
+    expected: '-0x100000000',
+  },
 ];
 
 // https://github.com/GoogleChromeLabs/jsbi/issues/36
