@@ -2034,6 +2034,7 @@ for (let i = 0; i < kDataDec.length; i++) {
     throw 'correctness error';
   }
 }
+console.log('Testing parsing:');
 console.log('Correctness: OK');
 let result;
 function testNative(data, reps) {
@@ -2056,6 +2057,6 @@ function testLibrary(data, reps) {
 }
 const kReps = 1000;
 console.log('Native hex: ' + testNative(kDataHex, kReps));
-console.log('JSB hex:    ' + testLibrary(kDataHex, kReps));
+console.log('JSBI hex:   ' + testLibrary(kDataHex, kReps));
 console.log('Native dec: ' + testNative(kDataDec, kReps));
-console.log('JSB dec:    ' + testLibrary(kDataDec, kReps));
+console.log('JSBI dec:   ' + testLibrary(kDataDec, kReps));
