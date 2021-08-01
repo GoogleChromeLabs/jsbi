@@ -682,6 +682,9 @@ function testNative(data, reps) {
       r = -d.a;
     }
   }
+  // Confuse the compiler into thinking that the loop is needed :-)
+  const d = data[data.length - 1];
+  if (d.r !== r) throw new Error('no dead code elimination please');
   return Date.now() - t1;
 }
 
@@ -706,6 +709,9 @@ function testJsbi(data, reps) {
       r = JSBI.unaryMinus(d.a);
     }
   }
+  // Confuse the compiler into thinking that the loop is needed :-)
+  const d = data[data.length - 1];
+  if (!JSBI.equal(r, d.r)) throw new Error('no dead code elimination please');
   return Date.now() - t1;
 }
 

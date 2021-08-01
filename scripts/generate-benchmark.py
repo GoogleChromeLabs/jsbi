@@ -129,6 +129,9 @@ function test%(variant)s(data, reps) {
       r = %(testop)s;
     }
   }
+  // Confuse the compiler into thinking that the loop is needed :-)
+  const d = data[data.length - 1];
+  if (%(comparison)s) throw new Error('no dead code elimination please');
   return Date.now() - t1;
 }
 """
