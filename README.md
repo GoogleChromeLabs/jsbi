@@ -30,16 +30,16 @@ Refer to the detailed instructions below for more information.
 
 ## Why?
 
-[Native BigInts are already shipping](https://v8.dev/features/bigint) in modern browsers (at the time of this writing, Google Chrome 67+, Opera 54+, Firefox 68+) and Node.js (v10.4+), and they are expected to come to other browsers in the future — which means you can't use them yet if you want your code to run everywhere.
+[Native BigInts are already shipping](https://v8.dev/features/bigint) in modern browsers (at the time of this writing, Google Chrome 67+, Opera 54+, Firefox 68+, Edge 79+, Safari 14+) and Node.js (v10.4+), but some users are still running older browsers — which means you can't use them yet if you want your code to run everywhere.
 
-To use BigInts in your code today, you need a library. But there’s a difficulty: the BigInt proposal changes the behavior of operators (like `+`, `>=`, etc.) to work on BigInts. These changes are impossible to polyfill directly; and they are also making it infeasible (in most cases) to transpile BigInt code to fallback code using Babel or similar tools. The reason is that such a transpilation would have to replace every single operator in the program with a call to some function that performs type checks on its inputs, which would incur an unacceptable performance penalty.
+To use BigInts in code that you want to run *everywhere*, you need a library. But there’s a difficulty: the BigInt proposal changes the behavior of operators (like `+`, `>=`, etc.) to work on BigInts. These changes are impossible to polyfill directly; and they are also making it infeasible (in most cases) to transpile BigInt code to fallback code using Babel or similar tools. The reason is that such a transpilation would have to replace every single operator in the program with a call to some function that performs type checks on its inputs, which would incur an unacceptable performance penalty.
 
 The solution is to do it the other way round: write code using a library’s syntax, and [transpile it to native BigInt code](https://github.com/GoogleChromeLabs/babel-plugin-transform-jsbi-to-bigint) when available. JSBI is designed for exactly this purpose: it provides a BigInt “polyfill” implementation that behaves exactly like the upcoming native BigInts, but with a syntax that you can ship on all browsers, today.
 
 Its advantages over other, existing big-integer libraries are:
 
-- it behaves exactly like native BigInts will when they become available, so to migrate to those, you can [mechanically](https://github.com/GoogleChromeLabs/babel-plugin-transform-jsbi-to-bigint) update your code’s syntax; no re-thinking of its logic will be required.
-- strong focus on performance. On average, JSBI is performance-competitive with the native implementation that Google Chrome is currently shipping.
+- it behaves exactly like native BigInts do where they are available, so to eventually migrate to those, you can [mechanically](https://github.com/GoogleChromeLabs/babel-plugin-transform-jsbi-to-bigint) update your code’s syntax; no re-thinking of its logic will be required.
+- strong focus on performance. On average, JSBI is performance-competitive with the native implementation that Google Chrome is currently shipping. (Note: we expect this statement to gradually become outdated as browsers invest in additional optimizations.)
 
 ## How?
 
@@ -55,7 +55,7 @@ Except for mechanical differences in syntax, you use JSBI-BigInts just [like you
 |                      | `BigInt.asUintN(64, a)` | `JSBI.asUintN(64, a)`    |
 | Type check           | `typeof a === 'bigint'` | `a instanceof JSBI`      |
 
-Most operators are replaced by method calls:
+Most operators are replaced by static functions:
 
 | Operation                   | native BigInts | JSBI                              |
 | --------------------------- | -------------- | --------------------------------- |
@@ -105,7 +105,7 @@ Unfortunately, there are also a few things that are not supported at all:
 | decrement             | `a--`          | N/A ☹                                |
 |                       | `a - 1n`       | `JSBI.subtract(a, JSBI.BigInt('1'))` |
 
-It is impossible to replicate the exact behavior of the native `++` and `--` operators with static functions. Since JSBI is intended to be transpiled away eventually, it doesn’t provide a similar-but-different alternative. You can use `JSBI.add()` and `JSBI.subtract()` instead.
+It is impossible to replicate the exact behavior of the native `++` and `--` operators in a polyfill/library. Since JSBI is intended to be transpiled away eventually, it doesn’t provide a similar-but-different alternative. You can use `JSBI.add()` and `JSBI.subtract()` instead.
 
 ## When?
 
