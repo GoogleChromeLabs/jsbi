@@ -23,7 +23,7 @@ class JSBI extends Array {
   static BigInt(arg) {
     if (typeof arg === 'number') {
       if (arg === 0) return JSBI.__zero();
-      if ((arg | 0) === arg) {
+      if (isInt(arg)) {
         if (arg < 0) {
           return JSBI.__oneDigit(-arg, true);
         }
@@ -951,7 +951,7 @@ class JSBI extends Array {
   }
 
   static __compareToNumber(x, y) {
-    if (y | 0 === 0) {
+    if (isInt(y)) {
       const xSign = x.sign;
       const ySign = (y < 0);
       if (xSign !== ySign) return JSBI.__unequalSign(xSign);
@@ -1056,7 +1056,7 @@ class JSBI extends Array {
   }
 
   static __equalToNumber(x, y) {
-    if (y | 0 === y) {
+    if (isInt(y)) {
       if (y === 0) return x.length === 0;
       // Any multi-digit BigInt is bigger than an int32.
       return (x.length === 1) && (x.sign === (y < 0)) &&
@@ -1843,6 +1843,10 @@ class JSBI extends Array {
     }
     return result;
   }
+}
+
+function isInt(x) {
+  return (x | 0) === x;
 }
 
 JSBI.__kMaxLength = 1 << 25;

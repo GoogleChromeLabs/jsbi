@@ -23,6 +23,8 @@ import JSBI from '../jsbi.mjs';
   console.assert('9007199254740993' === result.toString());
   // Test `JSBI.toNumber` as well.
   console.assert(9007199254740993 === JSBI.toNumber(result));
+  console.assert(JSBI.LT(parse('0x100000000'), 0x100000001));
+  console.assert(JSBI.EQ(parse('0xFFFFFFFF'), 0xFFFFFFFF));
 }
 
 const TESTS = [
