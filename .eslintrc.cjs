@@ -82,6 +82,12 @@ module.exports = {
         // This matches the spec.
         'capIsNew': false
       }
-    ]
+    ],
+    'no-dupe-class-members': [
+      // The eslint base linter reports errors for TS overrides. Turn this off
+      // in favour of the TS-specific one.
+      'off'
+    ],
+    '@typescript-eslint/no-dupe-class-members': ["error"]
   }
 };

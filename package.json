@@ -29,7 +29,7 @@
     "test": "for file in tests/*.mjs; do node --no-warnings --experimental-modules --experimental-specifier-resolution=node --loader ./tests/resolve.source.mjs \"${file}\"; done; set -e; for file in benchmarks/*.mjs; do node --no-warnings --experimental-modules --experimental-specifier-resolution=node --loader ./tests/resolve.source.mjs \"${file}\"; done",
     "pretest": "npm run build",
     "prepublish": "npm run ci",
-    "lint": "eslint --fix jsbi.ts",
+    "lint": "eslint . --ext ts --fix",
     "generate-benchmarks": "for op in add and div mod mul neg not or sar shl sub xor; do scripts/generate-benchmark.py generate \"${op}\" > \"benchmarks/${op}.mjs\"; done",
     "ci": "npm run lint && npm run build && git status && git diff-index --quiet HEAD -- || git diff && npm test"
   },
