@@ -243,7 +243,7 @@ class TestGenerator(object):
   def PrintTest(self, count):
     print(self.EmitLicense())
     print(self.EmitData(count))
-    print(self.EmitHeader("../jsbi.mjs"))
+    print(self.EmitHeader("../jsbi"))
     print(self.EmitTestBodyNative())
     print(self.EmitTestBodyJSBI())
     print(self.EmitFooter(self.GetReps()))

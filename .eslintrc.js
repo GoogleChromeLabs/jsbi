@@ -18,10 +18,14 @@ module.exports = {
     'es6': true,
     'node': true
   },
+  'plugins': [
+    '@typescript-eslint'
+  ],
   'extends': [
     'eslint:recommended',
     'google'
   ],
+  "parser": "@typescript-eslint/parser",
   'parserOptions': {
     'ecmaVersion': 2018,
     'sourceType': 'module'
@@ -29,6 +33,11 @@ module.exports = {
   'globals': {
     'BigInt': true
   },
+  "ignorePatterns": [
+    "node_modules/",
+    "/dist/",
+    "/tsc-out/",
+  ],
   'rules': {
     'linebreak-style': [
       'error',

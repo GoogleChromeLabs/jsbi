@@ -14,25 +14,40 @@
 import babel from 'rollup-plugin-babel';
 import pkg from './package.json';
 import minify from 'rollup-plugin-babel-minify';
+import typescript from '@rollup/plugin-typescript';
+
+const input = 'lib/jsbi.ts';
 
 export default [
   {
-    input: 'jsbi.mjs',
+    input: input,
     plugins: [
+      typescript(),
       minify({
         comments: false,
       }),
     ],
     output: [
       // Create a Node.js-friendly CommonJS build.
-      { file: pkg.main, format: 'cjs' },
+      {
+        file: pkg.main,
+        format: 'cjs',
+        exports: 'named',
+        sourcemap: true
+      },
       // Create a JavaScript module build, for bundlers.
-      { file: pkg.module, format: 'es' },
+      {
+         file: pkg.module,
+         format: 'es',
+         exports: 'named',
+         sourcemap: true
+      },
     ],
   },
   {
-    input: 'jsbi.mjs',
+    input: input,
     plugins: [
+      typescript(),
       babel(),
       minify({
         comments: false,
@@ -40,7 +55,13 @@ export default [
     ],
     output: [
       // Create a browser-friendly UMD build.
-      { name: 'JSBI', file: pkg.browser, format: 'umd' }
+      {
+        name: 'JSBI',
+        file: pkg.browser,
+        format: 'umd',
+        exports: 'named',
+        sourcemap: true
+      }
     ],
   },
 ];

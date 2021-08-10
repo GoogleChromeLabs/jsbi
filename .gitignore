@@ -1,4 +1,5 @@
 dist
+tsc-out
 
 # Installed npm modules
 node_modules

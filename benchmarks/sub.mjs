@@ -817,7 +817,7 @@ const dataSmall = [{
   r: '0x7bffcbe01'
 }];
 
-import JSBI from '../jsbi.mjs';
+import JSBI from '../jsbi';
 const JSBigInt = JSBI.BigInt;
 
 let errorCount = 0;
