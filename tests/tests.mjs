@@ -23,8 +23,15 @@ import JSBI from '../jsbi.mjs';
   console.assert('9007199254740993' === result.toString());
   // Test `JSBI.toNumber` as well.
   console.assert(9007199254740993 === JSBI.toNumber(result));
-  console.assert(JSBI.LT(parse('0x100000000'), 0x100000001));
-  console.assert(JSBI.EQ(parse('0xFFFFFFFF'), 0xFFFFFFFF));
+
+  // Corner cases near the single digit threshold.
+  console.assert(JSBI.LT(JSBI.BigInt('0x100000000'), 0x100000001));
+  console.assert(JSBI.EQ(JSBI.BigInt('0xFFFFFFFF'), 0xFFFFFFFF));
+  console.assert(JSBI.EQ(JSBI.BigInt('0x7FFFFFFF'), 0x7FFFFFFF));
+  console.assert(JSBI.EQ(JSBI.BigInt(0x7FFFFFFF), 0x7FFFFFFF));
+  console.assert(JSBI.EQ(JSBI.BigInt(-0x7FFFFFFF), -0x7FFFFFFF));
+  console.assert(JSBI.LT(JSBI.BigInt(0x7FFFFFF0), 0x7FFFFFFF));
+  console.assert(JSBI.GT(JSBI.BigInt(-0x7FFFFFF0), -0x7FFFFFFF));
 }
 
 const TESTS = [
