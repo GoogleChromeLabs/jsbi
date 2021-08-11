@@ -611,11 +611,13 @@ class JSBI extends Array {
       remainingMantissaBits = 32;
       digit = mantissaHigh;
       mantissaHigh = mantissaLow;
+      mantissaLow = 0;
     } else {
       const shift = msdTopBit - kMantissaHighTopBit;
       remainingMantissaBits = 32 - shift;
       digit = (mantissaHigh << shift) | (mantissaLow >>> (32 - shift));
       mantissaHigh = mantissaLow << shift;
+      mantissaLow = 0;
     }
     result.__setDigit(digits - 1, digit);
     // Then fill in the rest of the digits.
