@@ -32,6 +32,13 @@ import JSBI from '../jsbi.mjs';
   console.assert(JSBI.EQ(JSBI.BigInt(-0x7FFFFFFF), -0x7FFFFFFF));
   console.assert(JSBI.LT(JSBI.BigInt(0x7FFFFFF0), 0x7FFFFFFF));
   console.assert(JSBI.GT(JSBI.BigInt(-0x7FFFFFF0), -0x7FFFFFFF));
+
+  // Regression test for issue #63.
+  console.assert(
+      JSBI.BigInt(4.4384296245614243e+42).toString() ===
+      '4438429624561424320047307980392507864252416');
+  const str = '3361387880631608742970259577528807057005903';
+  console.assert(JSBI.toNumber(JSBI.BigInt(str)) === 3.361387880631609e+42);
 }
 
 const TESTS = [

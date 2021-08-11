@@ -103,10 +103,14 @@ class JSBI extends Array {
       mantissaLow = currentDigit << mantissaHighBitsUnset + 2;
       mantissaLowBitsUnset = mantissaHighBitsUnset + 2;
     }
-    if (mantissaLowBitsUnset > 0 && digitIndex > 0) {
+    while (mantissaLowBitsUnset > 0 && digitIndex > 0) {
       digitIndex--;
       currentDigit = x.__digit(digitIndex);
-      mantissaLow |= (currentDigit >>> (30 - mantissaLowBitsUnset));
+      if (mantissaLowBitsUnset >= 30) {
+        mantissaLow |= (currentDigit << (mantissaLowBitsUnset - 30));
+      } else {
+        mantissaLow |= (currentDigit >>> (30 - mantissaLowBitsUnset));
+      }
       mantissaLowBitsUnset -= 30;
     }
     const rounding = JSBI.__decideRounding(x, mantissaLowBitsUnset,
@@ -611,11 +615,13 @@ class JSBI extends Array {
       remainingMantissaBits = 32;
       digit = mantissaHigh;
       mantissaHigh = mantissaLow;
+      mantissaLow = 0;
     } else {
       const shift = msdTopBit - kMantissaHighTopBit;
       remainingMantissaBits = 32 - shift;
       digit = (mantissaHigh << shift) | (mantissaLow >>> (32 - shift));
       mantissaHigh = mantissaLow << shift;
+      mantissaLow = 0;
     }
     result.__setDigit(digits - 1, digit);
     // Then fill in the rest of the digits.
