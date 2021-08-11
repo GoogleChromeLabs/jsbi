@@ -395,6 +395,10 @@ class JSBI extends Array {
   static asIntN(n, x) {
     if (x.length === 0) return x;
     n = Math.floor(n);
+    if (n < 0) {
+      throw new RangeError(
+          'Invalid value: not (convertible to) a safe integer');
+    }
     if (n === 0) return JSBI.__zero();
     // If {x} has less than {n} bits, return it directly.
     if (n >= JSBI.__kMaxLengthBits) return x;
@@ -422,6 +426,10 @@ class JSBI extends Array {
   static asUintN(n, x) {
     if (x.length === 0) return x;
     n = Math.floor(n);
+    if (n < 0) {
+      throw new RangeError(
+          'Invalid value: not (convertible to) a safe integer');
+    }
     if (n === 0) return JSBI.__zero();
     // If {x} is negative, simulate two's complement representation.
     if (x.sign) {
@@ -705,6 +713,7 @@ class JSBI extends Array {
         }
       }
     }
+    if (sign !== 0 && radix !== 10) return null;
     // Skip leading zeros.
     while (current === 0x30) {
       leadingZero = true;
@@ -803,7 +812,6 @@ class JSBI extends Array {
     }
 
     // Get result.
-    if (sign !== 0 && radix !== 10) return null;
     result.sign = (sign === -1);
     return result.__trim();
   }
