@@ -83,7 +83,8 @@ const TESTS = [
 // https://github.com/GoogleChromeLabs/jsbi/issues/36
 (function() {
   const VALID = ['123', ' 123 ', '   123   '];
-  const INVALID = ['x123', 'x 123', ' 123x', '123 x', '123  xx', '123 ?a'];
+  const INVALID = ['x123', 'x 123', ' 123x', '123 x', '123  xx', '123 ?a',
+                   '-0o0', '-0x0', '-0b0', '-0x1'];
   for (const v of VALID) {
     const result = JSBI.BigInt(v);
     console.assert(JSBI.equal(result, JSBI.BigInt(123)));
