@@ -1,6 +1,5 @@
 {
   "name": "jsbi",
-  "type": "module",
   "version": "3.1.6",
   "repository": "GoogleChromeLabs/jsbi",
   "devDependencies": {
@@ -24,7 +23,7 @@
     "jsbi.d.ts"
   ],
   "scripts": {
-    "build": "tsc && rollup --config rollup.config.js",
+    "build": "tsc && for f in tsc-out/*.js; do mv -- \"$f\" \"${f%.js}.mjs\"; done && rollup --config rollup.config.js",
     "dev": "rollup --config rollup.config.js --watch",
     "test": "for file in tests/*.mjs; do node --no-warnings --experimental-modules --experimental-specifier-resolution=node --loader ./tests/resolve.source.mjs \"${file}\"; done; set -e; for file in benchmarks/*.mjs; do node --no-warnings --experimental-modules --experimental-specifier-resolution=node --loader ./tests/resolve.source.mjs \"${file}\"; done",
     "pretest": "npm run build",

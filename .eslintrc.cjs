@@ -25,7 +25,7 @@ module.exports = {
     'eslint:recommended',
     'google'
   ],
-  "parser": "@typescript-eslint/parser",
+  'parser': '@typescript-eslint/parser',
   'parserOptions': {
     'ecmaVersion': 2018,
     'sourceType': 'module'
@@ -33,10 +33,10 @@ module.exports = {
   'globals': {
     'BigInt': true
   },
-  "ignorePatterns": [
-    "node_modules/",
-    "/dist/",
-    "/tsc-out/",
+  'ignorePatterns': [
+    'node_modules/',
+    '/dist/',
+    '/tsc-out/',
   ],
   'rules': {
     'linebreak-style': [
@@ -88,6 +88,6 @@ module.exports = {
       // in favour of the TS-specific one.
       'off'
     ],
-    '@typescript-eslint/no-dupe-class-members': ["error"]
+    '@typescript-eslint/no-dupe-class-members': ['error']
   }
 };
