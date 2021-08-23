@@ -32,14 +32,14 @@ export default [
       {
         file: pkg.main,
         format: 'cjs',
-        exports: 'named',
+        exports: 'default',
         sourcemap: true,
       },
       // Create a JavaScript module build, for bundlers.
       {
         file: pkg.module,
         format: 'es',
-        exports: 'named',
+        exports: 'default',
         sourcemap: true,
       },
     ],
