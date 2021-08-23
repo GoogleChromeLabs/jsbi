@@ -1,4 +1,4 @@
-import JSBI from '../jsbi.mjs';
+import JSBI from '../jsbi';
 
 const intn_data = [
   {expected: '-1', n: 3, x: '15'},

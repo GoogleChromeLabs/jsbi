@@ -12,15 +12,14 @@
 // limitations under the License.
 
 class JSBI extends Array {
-  constructor(length, sign) {
+  constructor(length: number, private sign: boolean) {
+    super(length);
     if (length > JSBI.__kMaxLength) {
       throw new RangeError('Maximum BigInt size exceeded');
     }
-    super(length);
-    this.sign = sign;
   }
 
-  static BigInt(arg) {
+  static BigInt(arg: number|string|boolean|object): JSBI {
     if (typeof arg === 'number') {
       if (arg === 0) return JSBI.__zero();
       if (JSBI.__isOneDigitInt(arg)) {
@@ -53,7 +52,7 @@ class JSBI extends Array {
     throw new TypeError('Cannot convert ' + arg + ' to a BigInt');
   }
 
-  toDebugString() {
+  toDebugString(): string {
     const result = ['BigInt['];
     for (const digit of this) {
       result.push((digit ? (digit >>> 0).toString(16) : digit) + ', ');
@@ -62,7 +61,7 @@ class JSBI extends Array {
     return result.join('');
   }
 
-  toString(radix = 10) {
+  toString(radix: number = 10): string {
     if (radix < 2 || radix > 36) {
       throw new RangeError(
           'toString() radix argument must be between 2 and 36');
@@ -76,7 +75,7 @@ class JSBI extends Array {
 
   // Equivalent of "Number(my_bigint)" in the native implementation.
   // TODO: add more tests
-  static toNumber(x) {
+  static toNumber(x: JSBI): number {
     const xLength = x.length;
     if (xLength === 0) return 0;
     if (xLength === 1) {
@@ -140,14 +139,14 @@ class JSBI extends Array {
 
   // Operations.
 
-  static unaryMinus(x) {
+  static unaryMinus(x: JSBI): JSBI {
     if (x.length === 0) return x;
     const result = x.__copy();
     result.sign = !x.sign;
     return result;
   }
 
-  static bitwiseNot(x) {
+  static bitwiseNot(x: JSBI): JSBI {
     if (x.sign) {
       // ~(-x) == ~(~(x-1)) == x-1
       return JSBI.__absoluteSubOne(x).__trim();
@@ -156,7 +155,7 @@ class JSBI extends Array {
     return JSBI.__absoluteAddOne(x, true);
   }
 
-  static exponentiate(x, y) {
+  static exponentiate(x: JSBI, y: JSBI): JSBI {
     if (y.sign) {
       throw new RangeError('Exponent must be positive');
     }
@@ -206,10 +205,11 @@ class JSBI extends Array {
         }
       }
     }
-    return result;
+    // TODO see if there's a way for tsc to infer this will always happen?
+    return result as JSBI;
   }
 
-  static multiply(x, y) {
+  static multiply(x: JSBI, y: JSBI): JSBI {
     if (x.length === 0) return x;
     if (y.length === 0) return y;
     let resultLength = x.length + y.length;
@@ -224,7 +224,7 @@ class JSBI extends Array {
     return result.__trim();
   }
 
-  static divide(x, y) {
+  static divide(x: JSBI, y: JSBI): JSBI {
     if (y.length === 0) throw new RangeError('Division by zero');
     if (JSBI.__absoluteCompare(x, y) < 0) return JSBI.__zero();
     const resultSign = x.sign !== y.sign;
@@ -242,7 +242,7 @@ class JSBI extends Array {
     return quotient.__trim();
   }
 
-  static remainder(x, y) {
+  static remainder(x: JSBI, y: JSBI): JSBI {
     if (y.length === 0) throw new RangeError('Division by zero');
     if (JSBI.__absoluteCompare(x, y) < 0) return x;
     const divisor = y.__unsignedDigit(0);
@@ -257,7 +257,7 @@ class JSBI extends Array {
     return remainder.__trim();
   }
 
-  static add(x, y) {
+  static add(x: JSBI, y: JSBI): JSBI {
     const sign = x.sign;
     if (sign === y.sign) {
       // x + y == x + y
@@ -272,7 +272,7 @@ class JSBI extends Array {
     return JSBI.__absoluteSub(y, x, !sign);
   }
 
-  static subtract(x, y) {
+  static subtract(x: JSBI, y: JSBI): JSBI {
     const sign = x.sign;
     if (sign !== y.sign) {
       // x - (-y) == x + y
@@ -287,13 +287,13 @@ class JSBI extends Array {
     return JSBI.__absoluteSub(y, x, !sign);
   }
 
-  static leftShift(x, y) {
+  static leftShift(x: JSBI, y: JSBI): JSBI {
     if (y.length === 0 || x.length === 0) return x;
     if (y.sign) return JSBI.__rightShiftByAbsolute(x, y);
     return JSBI.__leftShiftByAbsolute(x, y);
   }
 
-  static signedRightShift(x, y) {
+  static signedRightShift(x: JSBI, y: JSBI): JSBI {
     if (y.length === 0 || x.length === 0) return x;
     if (y.sign) return JSBI.__leftShiftByAbsolute(x, y);
     return JSBI.__rightShiftByAbsolute(x, y);
@@ -304,23 +304,23 @@ class JSBI extends Array {
         'BigInts have no unsigned right shift; use >> instead');
   }
 
-  static lessThan(x, y) {
+  static lessThan(x: JSBI, y: JSBI): boolean {
     return JSBI.__compareToBigInt(x, y) < 0;
   }
 
-  static lessThanOrEqual(x, y) {
+  static lessThanOrEqual(x: JSBI, y: JSBI): boolean {
     return JSBI.__compareToBigInt(x, y) <= 0;
   }
 
-  static greaterThan(x, y) {
+  static greaterThan(x: JSBI, y: JSBI): boolean {
     return JSBI.__compareToBigInt(x, y) > 0;
   }
 
-  static greaterThanOrEqual(x, y) {
+  static greaterThanOrEqual(x: JSBI, y: JSBI): boolean {
     return JSBI.__compareToBigInt(x, y) >= 0;
   }
 
-  static equal(x, y) {
+  static equal(x: JSBI, y: JSBI): boolean {
     if (x.sign !== y.sign) return false;
     if (x.length !== y.length) return false;
     for (let i = 0; i < x.length; i++) {
@@ -329,11 +329,11 @@ class JSBI extends Array {
     return true;
   }
 
-  static notEqual(x, y) {
+  static notEqual(x: JSBI, y: JSBI): boolean {
     return !JSBI.equal(x, y);
   }
 
-  static bitwiseAnd(x, y) {
+  static bitwiseAnd(x: JSBI, y: JSBI): JSBI {
     if (!x.sign && !y.sign) {
       return JSBI.__absoluteAnd(x, y).__trim();
     } else if (x.sign && y.sign) {
@@ -353,7 +353,7 @@ class JSBI extends Array {
     return JSBI.__absoluteAndNot(x, JSBI.__absoluteSubOne(y)).__trim();
   }
 
-  static bitwiseXor(x, y) {
+  static bitwiseXor(x: JSBI, y: JSBI): JSBI {
     if (!x.sign && !y.sign) {
       return JSBI.__absoluteXor(x, y).__trim();
     } else if (x.sign && y.sign) {
@@ -374,7 +374,7 @@ class JSBI extends Array {
     return JSBI.__absoluteAddOne(result, true, result).__trim();
   }
 
-  static bitwiseOr(x, y) {
+  static bitwiseOr(x: JSBI, y: JSBI): JSBI {
     const resultLength = Math.max(x.length, y.length);
     if (!x.sign && !y.sign) {
       return JSBI.__absoluteOr(x, y).__trim();
@@ -396,7 +396,7 @@ class JSBI extends Array {
     return JSBI.__absoluteAddOne(result, true, result).__trim();
   }
 
-  static asIntN(n, x) {
+  static asIntN(n: number, x: JSBI): JSBI {
     if (x.length === 0) return x;
     n = Math.floor(n);
     if (n < 0) {
@@ -427,7 +427,7 @@ class JSBI extends Array {
     return JSBI.__truncateAndSubFromPowerOfTwo(n, x, false);
   }
 
-  static asUintN(n, x) {
+  static asUintN(n: number, x: JSBI): JSBI {
     if (x.length === 0) return x;
     n = Math.floor(n);
     if (n < 0) {
@@ -458,7 +458,7 @@ class JSBI extends Array {
 
   // Operators.
 
-  static ADD(x, y) {
+  static ADD(x: any, y: any) {
     x = JSBI.__toPrimitive(x);
     y = JSBI.__toPrimitive(y);
     if (typeof x === 'string') {
@@ -480,20 +480,20 @@ class JSBI extends Array {
         'Cannot mix BigInt and other types, use explicit conversions');
   }
 
-  static LT(x, y) {
+  static LT(x: any, y: any): boolean {
     return JSBI.__compare(x, y, 0);
   }
-  static LE(x, y) {
+  static LE(x: any, y: any): boolean {
     return JSBI.__compare(x, y, 1);
   }
-  static GT(x, y) {
+  static GT(x: any, y: any): boolean {
     return JSBI.__compare(x, y, 2);
   }
-  static GE(x, y) {
+  static GE(x: any, y: any): boolean {
     return JSBI.__compare(x, y, 3);
   }
 
-  static EQ(x, y) {
+  static EQ(x: any, y: any): boolean {
     while (true) {
       if (JSBI.__isBigInt(x)) {
         if (JSBI.__isBigInt(y)) return JSBI.equal(x, y);
@@ -527,23 +527,23 @@ class JSBI extends Array {
     }
   }
 
-  static NE(x, y) {
+  static NE(x: any, y: any): boolean {
     return !JSBI.EQ(x, y);
   }
 
   // Helpers.
 
-  static __zero() {
+  static __zero(): JSBI {
     return new JSBI(0, false);
   }
 
-  static __oneDigit(value, sign) {
+  static __oneDigit(value: number, sign: boolean): JSBI {
     const result = new JSBI(1, sign);
     result.__setDigit(0, value);
     return result;
   }
 
-  __copy() {
+  __copy(): JSBI {
     const result = new JSBI(this.length, this.sign);
     for (let i = 0; i < this.length; i++) {
       result[i] = this[i];
@@ -551,7 +551,7 @@ class JSBI extends Array {
     return result;
   }
 
-  __trim() {
+  __trim(): this {
     let newLength = this.length;
     let last = this[newLength - 1];
     while (last === 0) {
@@ -563,13 +563,14 @@ class JSBI extends Array {
     return this;
   }
 
-  __initializeDigits() {
+  __initializeDigits(): void {
     for (let i = 0; i < this.length; i++) {
       this[i] = 0;
     }
   }
 
-  static __decideRounding(x, mantissaBitsUnset, digitIndex, currentDigit) {
+  static __decideRounding(x: JSBI, mantissaBitsUnset: number,
+      digitIndex: number, currentDigit: number): 1|0|-1 {
     if (mantissaBitsUnset > 0) return -1;
     let topUnconsumedBit;
     if (mantissaBitsUnset < 0) {
@@ -594,7 +595,7 @@ class JSBI extends Array {
     return 0;
   }
 
-  static __fromDouble(value) {
+  static __fromDouble(value: number): JSBI {
     const sign = value < 0;
     JSBI.__kBitConversionDouble[0] = value;
     const rawExponent = (JSBI.__kBitConversionInts[1] >>> 20) & 0x7FF;
@@ -647,7 +648,7 @@ class JSBI extends Array {
     return result.__trim();
   }
 
-  static __isWhitespace(c) {
+  static __isWhitespace(c: number): boolean {
     if (c <= 0x0D && c >= 0x09) return true;
     if (c <= 0x9F) return c === 0x20;
     if (c <= 0x01FFFF) {
@@ -661,7 +662,7 @@ class JSBI extends Array {
     return c === 0xFEFF;
   }
 
-  static __fromString(string, radix = 0) {
+  static __fromString(string: string, radix:number = 0): JSBI|null {
     let sign = 0;
     let leadingZero = false;
     const length = string.length;
@@ -822,7 +823,8 @@ class JSBI extends Array {
     return result.__trim();
   }
 
-  static __fillFromParts(result, parts, partsBits) {
+  static __fillFromParts(result: JSBI, parts: number[], partsBits: number[]):
+      void {
     let digitIndex = 0;
     let digit = 0;
     let bitsInDigit = 0;
@@ -850,7 +852,7 @@ class JSBI extends Array {
     }
   }
 
-  static __toStringBasePowerOfTwo(x, radix) {
+  static __toStringBasePowerOfTwo(x: JSBI, radix: number): string {
     const length = x.length;
     let bits = radix - 1;
     bits = ((bits >>> 1) & 0x55) + (bits & 0x55);
@@ -894,7 +896,8 @@ class JSBI extends Array {
     return result.join('');
   }
 
-  static __toStringGeneric(x, radix, isRecursiveCall) {
+  static __toStringGeneric(x: JSBI, radix: number, isRecursiveCall: boolean):
+      string {
     const length = x.length;
     if (length === 0) return '';
     if (length === 1) {
@@ -945,17 +948,17 @@ class JSBI extends Array {
     return firstHalf + secondHalf;
   }
 
-  static __unequalSign(leftNegative) {
+  static __unequalSign(leftNegative: boolean): number {
     return leftNegative ? -1 : 1;
   }
-  static __absoluteGreater(bothNegative) {
+  static __absoluteGreater(bothNegative: boolean): number {
     return bothNegative ? -1 : 1;
   }
-  static __absoluteLess(bothNegative) {
+  static __absoluteLess(bothNegative: boolean): number {
     return bothNegative ? 1 : -1;
   }
 
-  static __compareToBigInt(x, y) {
+  static __compareToBigInt(x: JSBI, y: JSBI): number {
     const xSign = x.sign;
     if (xSign !== y.sign) return JSBI.__unequalSign(xSign);
     const result = JSBI.__absoluteCompare(x, y);
@@ -964,7 +967,7 @@ class JSBI extends Array {
     return 0;
   }
 
-  static __compareToNumber(x, y) {
+  static __compareToNumber(x: JSBI, y: number): number {
     if (JSBI.__isOneDigitInt(y)) {
       const xSign = x.sign;
       const ySign = (y < 0);
@@ -984,7 +987,7 @@ class JSBI extends Array {
     return JSBI.__compareToDouble(x, y);
   }
 
-  static __compareToDouble(x, y) {
+  static __compareToDouble(x: JSBI, y: number): number {
     if (y !== y) return y; // NaN.
     if (y === Infinity) return -1;
     if (y === -Infinity) return 1;
@@ -1069,7 +1072,7 @@ class JSBI extends Array {
     return 0;
   }
 
-  static __equalToNumber(x, y) {
+  static __equalToNumber(x: JSBI, y: number) {
     if (JSBI.__isOneDigitInt(y)) {
       if (y === 0) return x.length === 0;
       // Any multi-digit BigInt is bigger than an int32.
@@ -1084,17 +1087,16 @@ class JSBI extends Array {
   // 1 - lessThanOrEqual
   // 2 - greaterThan
   // 3 - greaterThanOrEqual
-  static __comparisonResultToBool(result, op) {
+  static __comparisonResultToBool(result: number, op: 0|1|2|3) {
     switch (op) {
       case 0: return result < 0;
       case 1: return result <= 0;
       case 2: return result > 0;
       case 3: return result >= 0;
     }
-    throw new Error('unreachable');
   }
 
-  static __compare(x, y, op) {
+  static __compare(x: any, y: any, op: 0|1|2|3): boolean {
     x = JSBI.__toPrimitive(x);
     y = JSBI.__toPrimitive(y);
     if (typeof x === 'string' && typeof y === 'string') {
@@ -1128,7 +1130,7 @@ class JSBI extends Array {
     if (JSBI.__isBigInt(y)) {
       // Note that "op ^ 2" reverses the op's direction.
       return JSBI.__comparisonResultToBool(JSBI.__compareToNumber(y, x),
-          op ^ 2);
+          (op ^ 2) as 0|1|2|3);
     }
     if (typeof y !== 'number') throw new Error('implementation bug');
     switch (op) {
@@ -1139,11 +1141,11 @@ class JSBI extends Array {
     }
   }
 
-  __clzmsd() {
-    return JSBI.__clz30(this[this.length - 1]);
+  __clzmsd(): number {
+    return JSBI.__clz30(this.__digit(this.length - 1));
   }
 
-  static __absoluteAdd(x, y, resultSign) {
+  static __absoluteAdd(x: JSBI, y: JSBI, resultSign: boolean): JSBI {
     if (x.length < y.length) return JSBI.__absoluteAdd(y, x, resultSign);
     if (x.length === 0) return x;
     if (y.length === 0) return x.sign === resultSign ? x : JSBI.unaryMinus(x);
@@ -1170,7 +1172,7 @@ class JSBI extends Array {
     return result.__trim();
   }
 
-  static __absoluteSub(x, y, resultSign) {
+  static __absoluteSub(x: JSBI, y: JSBI, resultSign: boolean): JSBI {
     if (x.length === 0) return x;
     if (y.length === 0) return x.sign === resultSign ? x : JSBI.unaryMinus(x);
     const result = new JSBI(x.length, resultSign);
@@ -1189,7 +1191,7 @@ class JSBI extends Array {
     return result.__trim();
   }
 
-  static __absoluteAddOne(x, sign, result = null) {
+  static __absoluteAddOne(x: JSBI, sign: boolean, result: JSBI|null = null) {
     const inputLength = x.length;
     if (result === null) {
       result = new JSBI(inputLength, sign);
@@ -1208,7 +1210,7 @@ class JSBI extends Array {
     return result;
   }
 
-  static __absoluteSubOne(x, resultLength) {
+  static __absoluteSubOne(x: JSBI, resultLength?: number) {
     const length = x.length;
     resultLength = resultLength || length;
     const result = new JSBI(resultLength, false);
@@ -1225,7 +1227,7 @@ class JSBI extends Array {
     return result;
   }
 
-  static __absoluteAnd(x, y, result = null) {
+  static __absoluteAnd(x: JSBI, y: JSBI, result: JSBI|null = null) {
     let xLength = x.length;
     let yLength = y.length;
     let numPairs = yLength;
@@ -1254,7 +1256,7 @@ class JSBI extends Array {
     return result;
   }
 
-  static __absoluteAndNot(x, y, result = null) {
+  static __absoluteAndNot(x: JSBI, y: JSBI, result: JSBI|null = null) {
     const xLength = x.length;
     const yLength = y.length;
     let numPairs = yLength;
@@ -1280,7 +1282,7 @@ class JSBI extends Array {
     return result;
   }
 
-  static __absoluteOr(x, y, result = null) {
+  static __absoluteOr(x: JSBI, y: JSBI, result: JSBI|null = null) {
     let xLength = x.length;
     let yLength = y.length;
     let numPairs = yLength;
@@ -1312,7 +1314,7 @@ class JSBI extends Array {
     return result;
   }
 
-  static __absoluteXor(x, y, result = null) {
+  static __absoluteXor(x: JSBI, y: JSBI, result: JSBI|null = null) {
     let xLength = x.length;
     let yLength = y.length;
     let numPairs = yLength;
@@ -1344,7 +1346,7 @@ class JSBI extends Array {
     return result;
   }
 
-  static __absoluteCompare(x, y) {
+  static __absoluteCompare(x: JSBI, y: JSBI) {
     const diff = x.length - y.length;
     if (diff !== 0) return diff;
     let i = x.length - 1;
@@ -1353,8 +1355,8 @@ class JSBI extends Array {
     return x.__unsignedDigit(i) > y.__unsignedDigit(i) ? 1 : -1;
   }
 
-  static __multiplyAccumulate(multiplicand, multiplier, accumulator,
-      accumulatorIndex) {
+  static __multiplyAccumulate(multiplicand: JSBI, multiplier: number,
+      accumulator: JSBI, accumulatorIndex: number): void {
     if (multiplier === 0) return;
     const m2Low = multiplier & 0x7FFF;
     const m2High = multiplier >>> 15;
@@ -1386,7 +1388,8 @@ class JSBI extends Array {
     }
   }
 
-  static __internalMultiplyAdd(source, factor, summand, n, result) {
+  static __internalMultiplyAdd(source: JSBI, factor: number, summand: number,
+      n: number, result: JSBI): void {
     let carry = summand;
     let high = 0;
     for (let i = 0; i < n; i++) {
@@ -1408,7 +1411,8 @@ class JSBI extends Array {
     }
   }
 
-  __inplaceMultiplyAdd(multiplier, summand, length) {
+  __inplaceMultiplyAdd(multiplier: number, summand: number, length: number):
+      void {
     if (length > this.length) length = this.length;
     const mLow = multiplier & 0x7FFF;
     const mHigh = multiplier >>> 15;
@@ -1435,7 +1439,8 @@ class JSBI extends Array {
     }
   }
 
-  static __absoluteDivSmall(x, divisor, quotient) {
+  static __absoluteDivSmall(x: JSBI, divisor: number,
+      quotient: JSBI|null = null): JSBI {
     if (quotient === null) quotient = new JSBI(x.length, false);
     let remainder = 0;
     for (let i = x.length * 2 - 1; i >= 0; i -= 2) {
@@ -1450,7 +1455,7 @@ class JSBI extends Array {
     return quotient;
   }
 
-  static __absoluteModSmall(x, divisor) {
+  static __absoluteModSmall(x: JSBI, divisor: number): number {
     let remainder = 0;
     for (let i = x.length * 2 - 1; i >= 0; i--) {
       const input = ((remainder << 15) | x.__halfDigit(i)) >>> 0;
@@ -1459,7 +1464,15 @@ class JSBI extends Array {
     return remainder;
   }
 
-  static __absoluteDivLarge(dividend, divisor, wantQuotient, wantRemainder) {
+  static __absoluteDivLarge(dividend: JSBI, divisor: JSBI, wantQuotient: false,
+      wantRemainder: false): undefined;
+  static __absoluteDivLarge(dividend: JSBI, divisor: JSBI, wantQuotient: true,
+      wantRemainder: true): { quotient: JSBI; remainder: JSBI; };
+  static __absoluteDivLarge(dividend: JSBI, divisor: JSBI,
+      wantQuotient: boolean, wantRemainder: boolean): JSBI;
+  static __absoluteDivLarge(dividend: JSBI, divisor: JSBI,
+      wantQuotient: boolean, wantRemainder: boolean):
+      { quotient: JSBI; remainder: JSBI; }|JSBI|undefined {
     const n = divisor.__halfDigitLength();
     const n2 = divisor.length;
     const m = dividend.__halfDigitLength() - n;
@@ -1507,26 +1520,29 @@ class JSBI extends Array {
         if (j & 1) {
           halfDigitBuffer = qhat << 15;
         } else {
-          q.__setDigit(j >>> 1, halfDigitBuffer | qhat);
+          // TODO make this statically determinable
+          (q as JSBI).__setDigit(j >>> 1, halfDigitBuffer | qhat);
         }
       }
     }
     if (wantRemainder) {
       u.__inplaceRightShift(shift);
       if (wantQuotient) {
-        return {quotient: q, remainder: u};
+        return {quotient: (q as JSBI), remainder: u};
       }
       return u;
     }
-    if (wantQuotient) return q;
+    if (wantQuotient) return (q as JSBI);
+    // TODO find a way to make this statically unreachable?
+    throw new Error('unreachable');
   }
 
-  static __clz15(value) {
+  static __clz15(value: number): number {
     return JSBI.__clz30(value) - 15;
   }
 
   // TODO: work on full digits, like __inplaceSub?
-  __inplaceAdd(summand, startIndex, halfDigits) {
+  __inplaceAdd(summand: JSBI, startIndex: number, halfDigits: number): number {
     let carry = 0;
     for (let i = 0; i < halfDigits; i++) {
       const sum = this.__halfDigit(startIndex + i) +
@@ -1538,7 +1554,8 @@ class JSBI extends Array {
     return carry;
   }
 
-  __inplaceSub(subtrahend, startIndex, halfDigits) {
+  __inplaceSub(subtrahend: JSBI, startIndex: number, halfDigits: number):
+      number {
     const fullSteps = (halfDigits - 1) >>> 1;
     let borrow = 0;
     if (startIndex & 1) {
@@ -1599,7 +1616,7 @@ class JSBI extends Array {
     return borrow;
   }
 
-  __inplaceRightShift(shift) {
+  __inplaceRightShift(shift: number): void {
     if (shift === 0) return;
     let carry = this.__digit(0) >>> shift;
     const last = this.length - 1;
@@ -1611,7 +1628,7 @@ class JSBI extends Array {
     this.__setDigit(last, carry);
   }
 
-  static __specialLeftShift(x, shift, addDigit) {
+  static __specialLeftShift(x: JSBI, shift: number, addDigit: 0|1): JSBI {
     const n = x.length;
     const resultLength = n + addDigit;
     const result = new JSBI(resultLength, false);
@@ -1632,7 +1649,7 @@ class JSBI extends Array {
     return result;
   }
 
-  static __leftShiftByAbsolute(x, y) {
+  static __leftShiftByAbsolute(x: JSBI, y: JSBI): JSBI {
     const shift = JSBI.__toShiftAmount(y);
     if (shift < 0) throw new RangeError('BigInt too big');
     const digitShift = (shift / 30) | 0;
@@ -1666,7 +1683,7 @@ class JSBI extends Array {
     return result.__trim();
   }
 
-  static __rightShiftByAbsolute(x, y) {
+  static __rightShiftByAbsolute(x: JSBI, y: JSBI): JSBI {
     const length = x.length;
     const sign = x.sign;
     const shift = JSBI.__toShiftAmount(y);
@@ -1725,21 +1742,21 @@ class JSBI extends Array {
     return result.__trim();
   }
 
-  static __rightShiftByMaximum(sign) {
+  static __rightShiftByMaximum(sign: boolean): JSBI {
     if (sign) {
       return JSBI.__oneDigit(1, true);
     }
     return JSBI.__zero();
   }
 
-  static __toShiftAmount(x) {
+  static __toShiftAmount(x: JSBI): number {
     if (x.length > 1) return -1;
     const value = x.__unsignedDigit(0);
     if (value > JSBI.__kMaxLengthBits) return -1;
     return value;
   }
 
-  static __toPrimitive(obj, hint='default') {
+  static __toPrimitive(obj: any, hint='default'): any {
     if (typeof obj !== 'object') return obj;
     if (obj.constructor === JSBI) return obj;
     const exoticToPrim = obj[Symbol.toPrimitive];
@@ -1761,17 +1778,17 @@ class JSBI extends Array {
     throw new TypeError('Cannot convert object to primitive value');
   }
 
-  static __toNumeric(value) {
+  static __toNumeric(value: unknown): number|JSBI {
     if (JSBI.__isBigInt(value)) return value;
-    return +value;
+    return +(value as any);
   }
 
-  static __isBigInt(value) {
+  static __isBigInt(value: unknown): value is JSBI {
     return typeof value === 'object' && value !== null &&
            value.constructor === JSBI;
   }
 
-  static __truncateToNBits(n, x) {
+  static __truncateToNBits(n: number, x: JSBI): JSBI {
     const neededDigits = ((n + 29) / 30) | 0;
     const result = new JSBI(neededDigits, x.sign);
     const last = neededDigits - 1;
@@ -1787,7 +1804,8 @@ class JSBI extends Array {
     return result.__trim();
   }
 
-  static __truncateAndSubFromPowerOfTwo(n, x, resultSign) {
+  static __truncateAndSubFromPowerOfTwo(n: number, x: JSBI,
+      resultSign: boolean): JSBI {
     const neededDigits = ((n + 29) / 30) | 0;
     const result = new JSBI(neededDigits, resultSign);
     let i = 0;
@@ -1820,27 +1838,27 @@ class JSBI extends Array {
   }
 
   // Digit helpers.
-  __digit(i) {
+  __digit(i: number): number {
     return this[i];
   }
-  __unsignedDigit(i) {
+  __unsignedDigit(i: number): number {
     return this[i] >>> 0;
   }
-  __setDigit(i, digit) {
+  __setDigit(i: number, digit: number): void {
     this[i] = digit | 0;
   }
-  __setDigitGrow(i, digit) {
+  __setDigitGrow(i: number, digit: number): void {
     this[i] = digit | 0;
   }
-  __halfDigitLength() {
+  __halfDigitLength(): number {
     const len = this.length;
     if (this.__unsignedDigit(len - 1) <= 0x7FFF) return len * 2 - 1;
     return len*2;
   }
-  __halfDigit(i) {
+  __halfDigit(i: number): number {
     return (this[i >>> 1] >>> ((i & 1) * 15)) & 0x7FFF;
   }
-  __setHalfDigit(i, value) {
+  __setHalfDigit(i: number, value: number): void {
     const digitIndex = i >>> 1;
     const previous = this.__digit(digitIndex);
     const updated = (i & 1) ? (previous & 0x7FFF) | (value << 15)
@@ -1848,7 +1866,7 @@ class JSBI extends Array {
     this.__setDigit(digitIndex, updated);
   }
 
-  static __digitPow(base, exponent) {
+  static __digitPow(base: number, exponent: number) {
     let result = 1;
     while (exponent > 0) {
       if (exponent & 1) result *= base;
@@ -1858,45 +1876,45 @@ class JSBI extends Array {
     return result;
   }
 
-  static __isOneDigitInt(x) {
+  static __kMaxLength = 1 << 25;
+  static __kMaxLengthBits = JSBI.__kMaxLength << 5;
+  // Lookup table for the maximum number of bits required per character of a
+  // base-N string representation of a number. To increase accuracy, the array
+  // value is the actual value multiplied by 32. To generate this table:
+  //
+  // for (let i = 0; i <= 36; i++) {
+  //   console.log(Math.ceil(Math.log2(i) * 32) + ',');
+  // }
+  static __kMaxBitsPerChar = [
+    0, 0, 32, 51, 64, 75, 83, 90, 96, // 0..8
+    102, 107, 111, 115, 119, 122, 126, 128, // 9..16
+    131, 134, 136, 139, 141, 143, 145, 147, // 17..24
+    149, 151, 153, 154, 156, 158, 159, 160, // 25..32
+    162, 163, 165, 166, // 33..36
+  ];
+
+  static __kBitsPerCharTableShift = 5;
+  static __kBitsPerCharTableMultiplier = 1 << JSBI.__kBitsPerCharTableShift;
+  static __kConversionChars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
+  static __kBitConversionBuffer = new ArrayBuffer(8);
+  static __kBitConversionDouble = new Float64Array(JSBI.__kBitConversionBuffer);
+  static __kBitConversionInts = new Int32Array(JSBI.__kBitConversionBuffer);
+
+  // For IE11 compatibility.
+  // Note that the custom replacements are tailored for JSBI's needs, and as
+  // such are not reusable as general-purpose polyfills.
+  static __clz30 = Math.clz32 ? function(x: number): number {
+    return Math.clz32(x) - 2;
+  } : function(x: number) {
+    if (x === 0) return 30;
+    return 29 - (Math.log(x >>> 0) / Math.LN2 | 0) | 0;
+  };
+  static __imul = Math.imul || function(a: number, b: number) {
+    return (a * b) | 0;
+  };
+  static __isOneDigitInt(x: number) {
     return (x & 0x3FFFFFFF) === x;
   }
 }
-
-JSBI.__kMaxLength = 1 << 25;
-JSBI.__kMaxLengthBits = JSBI.__kMaxLength << 5;
-// Lookup table for the maximum number of bits required per character of a
-// base-N string representation of a number. To increase accuracy, the array
-// value is the actual value multiplied by 32. To generate this table:
-//
-// for (let i = 0; i <= 36; i++) {
-//   console.log(Math.ceil(Math.log2(i) * 32) + ',');
-// }
-JSBI.__kMaxBitsPerChar = [
-  0, 0, 32, 51, 64, 75, 83, 90, 96, // 0..8
-  102, 107, 111, 115, 119, 122, 126, 128, // 9..16
-  131, 134, 136, 139, 141, 143, 145, 147, // 17..24
-  149, 151, 153, 154, 156, 158, 159, 160, // 25..32
-  162, 163, 165, 166, // 33..36
-];
-JSBI.__kBitsPerCharTableShift = 5;
-JSBI.__kBitsPerCharTableMultiplier = 1 << JSBI.__kBitsPerCharTableShift;
-JSBI.__kConversionChars = '0123456789abcdefghijklmnopqrstuvwxyz'.split('');
-JSBI.__kBitConversionBuffer = new ArrayBuffer(8);
-JSBI.__kBitConversionDouble = new Float64Array(JSBI.__kBitConversionBuffer);
-JSBI.__kBitConversionInts = new Int32Array(JSBI.__kBitConversionBuffer);
-
-// For IE11 compatibility.
-// Note that the custom replacements are tailored for JSBI's needs, and as
-// such are not reusable as general-purpose polyfills.
-JSBI.__clz30 = Math.clz32 ? function(x) {
-  return Math.clz32(x) - 2;
-} : function(x) {
-  if (x === 0) return 30;
-  return 29 - (Math.log(x >>> 0) / Math.LN2 | 0) | 0;
-};
-JSBI.__imul = Math.imul || function(a, b) {
-  return (a * b) | 0;
-};
 
 export default JSBI;

@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import JSBI from '../jsbi.mjs';
+import JSBI from '../jsbi';
 
 {
   // Test the example from the README.
