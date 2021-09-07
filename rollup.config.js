@@ -59,7 +59,7 @@ export default [
         name: 'JSBI',
         file: pkg.browser,
         format: 'umd',
-        exports: 'named',
+        exports: 'default',
         sourcemap: true,
       },
     ],
