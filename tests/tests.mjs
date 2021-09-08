@@ -39,6 +39,13 @@ import JSBI from '../jsbi';
       '4438429624561424320047307980392507864252416');
   const str = '3361387880631608742970259577528807057005903';
   console.assert(JSBI.toNumber(JSBI.BigInt(str)) === 3.361387880631609e+42);
+
+  // Regression test for issue #72.
+  console.assert(JSBI.EQ(max, Number.MAX_SAFE_INTEGER));
+
+  console.assert(JSBI.EQ(JSBI.BigInt(18014398509481980), 18014398509481980));
+  console.assert(JSBI.EQ(JSBI.BigInt(18014398509481982), 18014398509481982));
+  console.assert(JSBI.EQ(JSBI.BigInt(18014398509481988), 18014398509481988));
 }
 
 const TESTS = [
