@@ -1,6 +1,6 @@
 {
   "name": "jsbi",
-  "version": "3.2.2",
+  "version": "3.2.3",
   "repository": "GoogleChromeLabs/jsbi",
   "devDependencies": {
     "@babel/preset-env": "^7.5.5",
