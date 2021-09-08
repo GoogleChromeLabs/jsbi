@@ -1039,12 +1039,14 @@ class JSBI extends Array {
       remainingMantissaBits = 32;
       compareMantissa = mantissaHigh;
       mantissaHigh = mantissaLow;
+      mantissaLow = 0;
     } else {
       const shift = msdTopBit - kMantissaHighTopBit;
       remainingMantissaBits = 32 - shift;
       compareMantissa =
           (mantissaHigh << shift) | (mantissaLow >>> (32 - shift));
       mantissaHigh = mantissaLow << shift;
+      mantissaLow = 0;
     }
     xMsd = xMsd >>> 0;
     compareMantissa = compareMantissa >>> 0;
