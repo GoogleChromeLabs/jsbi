@@ -25,7 +25,7 @@
   "scripts": {
     "build": "tsc && for f in tsc-out/*.js; do mv -- \"$f\" \"${f%.js}.mjs\"; done && rollup --config rollup.config.js",
     "dev": "rollup --config rollup.config.js --watch",
-    "test": "for file in tests/*.mjs; do node --no-warnings --experimental-modules --experimental-specifier-resolution=node --loader ./tests/resolve.source.mjs \"${file}\"; done; set -e; for file in benchmarks/*.mjs; do node --no-warnings --experimental-modules --experimental-specifier-resolution=node --loader ./tests/resolve.source.mjs \"${file}\"; done",
+    "test": "set -e; for file in tests/*.mjs; do node --no-warnings --experimental-modules --experimental-specifier-resolution=node --loader ./tests/resolve.source.mjs \"${file}\"; done; for file in benchmarks/*.mjs; do node --no-warnings --experimental-modules --experimental-specifier-resolution=node --loader ./tests/resolve.source.mjs \"${file}\"; done",
     "pretest": "npm run build",
     "prepublish": "npm run ci",
     "lint": "eslint . --ext ts --fix",
