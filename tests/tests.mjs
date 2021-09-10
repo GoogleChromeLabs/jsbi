@@ -46,6 +46,22 @@ import JSBI from '../jsbi';
   console.assert(JSBI.EQ(JSBI.BigInt(18014398509481980), 18014398509481980));
   console.assert(JSBI.EQ(JSBI.BigInt(18014398509481982), 18014398509481982));
   console.assert(JSBI.EQ(JSBI.BigInt(18014398509481988), 18014398509481988));
+
+  // Emulate an environment that doesn't have Symbol (e.g. IE11)
+  // and make sure we can still coerce to primitive values.
+  // See #74.
+ const globalSymbol = globalThis.Symbol;
+  try {
+    globalThis.Symbol = undefined;
+    console.assert(JSBI.EQ(JSBI.BigInt(0x7FFFFFFF), {
+      valueOf: () => 0x7FFFFFFF,
+    }));
+    console.assert(JSBI.LT(JSBI.BigInt(0x7FFFFFF0), {
+      valueOf: () => 0x7FFFFFFF,
+    }));
+  } finally {
+    globalThis.Symbol = globalSymbol;
+  }
 }
 
 const TESTS = [

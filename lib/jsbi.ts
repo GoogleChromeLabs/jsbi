@@ -1761,11 +1761,14 @@ class JSBI extends Array {
   static __toPrimitive(obj: any, hint='default'): any {
     if (typeof obj !== 'object') return obj;
     if (obj.constructor === JSBI) return obj;
-    const exoticToPrim = obj[Symbol.toPrimitive];
-    if (exoticToPrim) {
-      const primitive = exoticToPrim(hint);
-      if (typeof primitive !== 'object') return primitive;
-      throw new TypeError('Cannot convert object to primitive value');
+    if (typeof Symbol !== 'undefined' &&
+          typeof Symbol.toPrimitive === 'symbol') {
+      const exoticToPrim = obj[Symbol.toPrimitive];
+      if (exoticToPrim) {
+        const primitive = exoticToPrim(hint);
+        if (typeof primitive !== 'object') return primitive;
+        throw new TypeError('Cannot convert object to primitive value');
+      }
     }
     const valueOf = obj.valueOf;
     if (valueOf) {
