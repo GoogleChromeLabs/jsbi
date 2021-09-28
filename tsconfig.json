@@ -14,6 +14,7 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
+    "noImplicitOverride": true,
     "noImplicitThis": true,
     "strict": false,
     "lib": [

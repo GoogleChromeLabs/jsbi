@@ -61,7 +61,7 @@ class JSBI extends Array {
     return result.join('');
   }
 
-  toString(radix: number = 10): string {
+  override toString(radix: number = 10): string {
     if (radix < 2 || radix > 36) {
       throw new RangeError(
           'toString() radix argument must be between 2 and 36');
