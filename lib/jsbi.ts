@@ -73,6 +73,10 @@ class JSBI extends Array {
     return JSBI.__toStringGeneric(this, radix, false);
   }
 
+  override valueOf() {
+    throw new Error('Convert JSBI instances to native numbers using `toNumber`.');
+  }
+
   // Equivalent of "Number(my_bigint)" in the native implementation.
   // TODO: add more tests
   static toNumber(x: JSBI): number {
