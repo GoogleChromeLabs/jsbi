@@ -62,6 +62,13 @@ import JSBI from '../jsbi';
   } finally {
     globalThis.Symbol = globalSymbol;
   }
+
+  try {
+    +JSBI.BigInt(0x7FFFFFFF);
+    console.assert(false, 'coercion of JSBI instances via valueOf should throw.');
+  } catch (error) {
+    console.assert(error instanceof Error);
+  }
 }
 
 const TESTS = [
