@@ -69,7 +69,7 @@ import { strict as assert } from 'assert';
     assert(false, 'coercion of JSBI instances via valueOf should throw.');
   } catch (error) {
     assert(error instanceof Error);
-    assert.equal(error.message, 'Convert JSBI instances to native numbers using `toNumber`. abc');
+    assert.equal(error.message, 'Convert JSBI instances to native numbers using `toNumber`.');
   }
 }
 
