@@ -1,5 +1,5 @@
 import JSBI from '../jsbi';
-import { strict as assert } from 'assert';
+import { assertTrue } from './assert';
 
 const intn_data = [
   {expected: '-1', n: 3, x: '15'},
@@ -296,7 +296,7 @@ for (const test of intn_data) {
   const x = parse(test.x);
   const expected = parse(test.expected);
   const result = JSBI.asIntN(test.n, x);
-  assert(JSBI.equal(expected, result),
+  assertTrue(JSBI.equal(expected, result),
     `Unexpected result for asIntN(${test.n}, ${ test.x }):
     Expected: ${ test.expected }
     Actual:   ${ result.toString() }`.trim());
@@ -306,7 +306,7 @@ for (const test of uintn_data) {
   const x = parse(test.x);
   const expected = parse(test.expected);
   const result = JSBI.asUintN(test.n, x);
-  assert(JSBI.equal(expected, result),
+  assertTrue(JSBI.equal(expected, result),
     `Unexpected result for asUintN(${test.n}, ${ test.x }):
     Expected: ${ test.expected }
     Actual:   ${ result.toString() }`.trim());
