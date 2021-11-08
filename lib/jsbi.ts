@@ -14,6 +14,9 @@
 class JSBI extends Array {
   constructor(length: number, private sign: boolean) {
     super(length);
+    // Explicitly set the prototype as per 
+    // https://github.com/Microsoft/TypeScript-wiki/blob/main/Breaking-Changes.md#extending-built-ins-like-error-array-and-map-may-no-longer-work
+    Object.setPrototypeOf(this, JSBI.prototype);
     if (length > JSBI.__kMaxLength) {
       throw new RangeError('Maximum BigInt size exceeded');
     }
