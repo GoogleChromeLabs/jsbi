@@ -4,7 +4,6 @@
   "repository": "GoogleChromeLabs/jsbi",
   "devDependencies": {
     "@babel/preset-env": "^7.5.5",
-    "@rollup/plugin-typescript": "^8.2.5",
     "@typescript-eslint/eslint-plugin": "^4.29.1",
     "@typescript-eslint/parser": "^4.29.1",
     "eslint": "^6.2.0",
@@ -24,7 +23,7 @@
   ],
   "scripts": {
     "build": "tsc && for f in tsc-out/*.js; do mv -- \"$f\" \"${f%.js}.mjs\"; done && rollup --config rollup.config.js",
-    "dev": "rollup --config rollup.config.js --watch",
+    "dev": "tsc --watch",
     "test": "set -e; for file in tests/*.mjs; do node --no-warnings --experimental-modules --experimental-specifier-resolution=node --loader ./tests/resolve.source.mjs \"${file}\"; done; for file in benchmarks/*.mjs; do node --no-warnings --experimental-modules --experimental-specifier-resolution=node --loader ./tests/resolve.source.mjs \"${file}\"; done",
     "pretest": "npm run build",
     "prepublish": "npm run ci",
