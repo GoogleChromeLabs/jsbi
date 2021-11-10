@@ -14,15 +14,15 @@
 import babel from 'rollup-plugin-babel';
 import pkg from './package.json';
 import minify from 'rollup-plugin-babel-minify';
-import typescript from '@rollup/plugin-typescript';
 
-const input = 'lib/jsbi.ts';
+// Keep JSBI bundle seperated and consistent after TS migration.
+// See issue #79.
+const input = 'tsc-out/jsbi.mjs';
 
 export default [
   {
     input: input,
     plugins: [
-      typescript(),
       minify({
         comments: false,
       }),
@@ -47,7 +47,6 @@ export default [
   {
     input: input,
     plugins: [
-      typescript(),
       babel(),
       minify({
         comments: false,
