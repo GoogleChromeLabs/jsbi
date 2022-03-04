@@ -14,7 +14,7 @@
 class JSBI extends Array {
   constructor(length: number, private sign: boolean) {
     super(length);
-    // Explicitly set the prototype as per 
+    // Explicitly set the prototype as per
     // https://github.com/Microsoft/TypeScript-wiki/blob/main/Breaking-Changes.md#extending-built-ins-like-error-array-and-map-may-no-longer-work
     Object.setPrototypeOf(this, JSBI.prototype);
     if (length > JSBI.__kMaxLength) {
@@ -77,7 +77,8 @@ class JSBI extends Array {
   }
 
   override valueOf() {
-    throw new Error('Convert JSBI instances to native numbers using `toNumber`.');
+    throw new Error(
+        'Convert JSBI instances to native numbers using `toNumber`.');
   }
 
   // Equivalent of "Number(my_bigint)" in the native implementation.
@@ -536,6 +537,54 @@ class JSBI extends Array {
 
   static NE(x: any, y: any): boolean {
     return !JSBI.EQ(x, y);
+  }
+
+  // DataView-related functionality.
+
+  static DataViewGetBigInt64(
+      dataview: DataView, byteOffset: number, littleEndian: boolean = false) {
+    return JSBI.asIntN(
+        64, JSBI.DataViewGetBigUint64(dataview, byteOffset, littleEndian));
+  }
+
+  static DataViewGetBigUint64(
+      dataview: DataView, byteOffset: number, littleEndian: boolean = false) {
+    const [h, l] = littleEndian ? [4, 0] : [0, 4];
+    const high = dataview.getUint32(byteOffset + h, littleEndian);
+    const low = dataview.getUint32(byteOffset + l, littleEndian);
+    const result = new JSBI(3, false);
+    result.__setDigit(0, low & 0x3FFFFFFF);
+    result.__setDigit(1, ((high & 0xFFFFFFF) << 2) | (low >>> 30));
+    result.__setDigit(2, high >>> 28);
+    return result.__trim();
+  }
+
+  static DataViewSetBigInt64(
+      dataview: DataView, byteOffset: number, value: JSBI,
+      littleEndian: boolean = false) {
+    JSBI.DataViewSetBigUint64(dataview, byteOffset, value, littleEndian);
+  }
+
+  static DataViewSetBigUint64(
+      dataview: DataView, byteOffset: number, value: JSBI,
+      littleEndian: boolean = false) {
+    value = JSBI.asUintN(64, value);
+    let high = 0;
+    let low = 0;
+    if (value.length > 0) {
+      low = value.__digit(0);
+      if (value.length > 1) {
+        const d1 = value.__digit(1);
+        low = low | d1 << 30;
+        high = d1 >>> 2;
+        if (value.length > 2) {
+          high = high | (value.__digit(2) << 28);
+        }
+      }
+    }
+    const [h, l] = littleEndian ? [4, 0] : [0, 4];
+    dataview.setUint32(byteOffset + h, high, littleEndian);
+    dataview.setUint32(byteOffset + l, low, littleEndian);
   }
 
   // Helpers.
