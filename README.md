@@ -107,6 +107,15 @@ Unfortunately, there are also a few things that are not supported at all:
 
 It is impossible to replicate the exact behavior of the native `++` and `--` operators in a polyfill/library. Since JSBI is intended to be transpiled away eventually, it doesn’t provide a similar-but-different alternative. You can use `JSBI.add()` and `JSBI.subtract()` instead.
 
+Since version 4.2.0, polyfills for `DataView` operations are included (where `dv` is a `DataView`, `i` is an index, `le` is an optional boolean indicating little endian mode, and `x` is a `BigInt` or a `JSBI` instance, respectively):
+
+| native BigInts/DataViews    | JSBI                                      |
+|-----------------------------|-------------------------------------------|
+| `dv.getBigInt64(i, le)`     | `JSBI.DataViewGetBigInt64(dv, i, le)`     |
+| `dv.setBigInt64(i, x, le)`  | `JSBI.DataViewSetBigInt64(dv, i, x, le)`  |
+| `dv.getBigUint64(i, le)`    | `JSBI.DataViewGetBigUint64(dv, i, le)`    |
+| `dv.setBigUint64(i, x, le)` | `JSBI.DataViewSetBigUint64(dv, i, x, le)` |
+
 ## When?
 
 Now! The JSBI library is ready for use today.
