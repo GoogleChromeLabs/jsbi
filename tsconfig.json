@@ -4,6 +4,7 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
+    "declaration": true,
     "downlevelIteration": true,
     "importHelpers": false,
     "inlineSources": false,
