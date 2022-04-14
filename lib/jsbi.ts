@@ -12,7 +12,7 @@
 // limitations under the License.
 
 class JSBI extends Array {
-  constructor(length: number, private sign: boolean) {
+  private constructor(length: number, private sign: boolean) {
     super(length);
     // Explicitly set the prototype as per
     // https://github.com/Microsoft/TypeScript-wiki/blob/main/Breaking-Changes.md#extending-built-ins-like-error-array-and-map-may-no-longer-work
