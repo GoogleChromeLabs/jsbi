@@ -1,6 +1,6 @@
 declare class JSBI extends Array {
     private sign;
-    constructor(length: number, sign: boolean);
+    private constructor();
     static BigInt(arg: number | string | boolean | object): JSBI;
     toDebugString(): string;
     toString(radix?: number): string;
