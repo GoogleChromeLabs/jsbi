@@ -11,7 +11,7 @@ npm install jsbi --save
 ## Usage
 
 ```js
-import JSBI from './jsbi.mjs';
+import JSBI from 'jsbi';
 
 const max = JSBI.BigInt(Number.MAX_SAFE_INTEGER);
 console.log(String(max));
