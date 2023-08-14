@@ -140,8 +140,9 @@ class JSBI extends Array {
     }
     const signBit = x.sign ? (1 << 31) : 0;
     exponent = (exponent + 0x3FF) << 20;
-    JSBI.__kBitConversionInts[1] = signBit | exponent | mantissaHigh;
-    JSBI.__kBitConversionInts[0] = mantissaLow;
+    JSBI.__kBitConversionInts[JSBI.__kBitConversionIntHigh] =
+        signBit | exponent | mantissaHigh;
+    JSBI.__kBitConversionInts[JSBI.__kBitConversionIntLow] = mantissaLow;
     return JSBI.__kBitConversionDouble[0];
   }
 
@@ -654,13 +655,17 @@ class JSBI extends Array {
   static __fromDouble(value: number): JSBI {
     const sign = value < 0;
     JSBI.__kBitConversionDouble[0] = value;
-    const rawExponent = (JSBI.__kBitConversionInts[1] >>> 20) & 0x7FF;
+    const rawExponent =
+        (JSBI.__kBitConversionInts[JSBI.__kBitConversionIntHigh] >>> 20) &
+        0x7FF;
     const exponent = rawExponent - 0x3FF;
     const digits = ((exponent / 30) | 0) + 1;
     const result = new JSBI(digits, sign);
     const kHiddenBit = 0x00100000;
-    let mantissaHigh = (JSBI.__kBitConversionInts[1] & 0xFFFFF) | kHiddenBit;
-    let mantissaLow = JSBI.__kBitConversionInts[0];
+    let mantissaHigh =
+        (JSBI.__kBitConversionInts[JSBI.__kBitConversionIntHigh] & 0xFFFFF) |
+        kHiddenBit;
+    let mantissaLow = JSBI.__kBitConversionInts[JSBI.__kBitConversionIntLow];
     const kMantissaHighTopBit = 20;
     // 0-indexed position of most significant bit in most significant digit.
     const msdTopBit = exponent % 30;
@@ -1055,7 +1060,9 @@ class JSBI extends Array {
     }
     if (x.length === 0) return -1;
     JSBI.__kBitConversionDouble[0] = y;
-    const rawExponent = (JSBI.__kBitConversionInts[1] >>> 20) & 0x7FF;
+    const rawExponent =
+        (JSBI.__kBitConversionInts[JSBI.__kBitConversionIntHigh] >>> 20) &
+        0x7FF;
     if (rawExponent === 0x7FF) {
       throw new Error('implementation bug: handled elsewhere');
     }
@@ -1075,8 +1082,10 @@ class JSBI extends Array {
     // Same sign, same bit length. Shift mantissa to align with x and compare
     // bit for bit.
     const kHiddenBit = 0x00100000;
-    let mantissaHigh = (JSBI.__kBitConversionInts[1] & 0xFFFFF) | kHiddenBit;
-    let mantissaLow = JSBI.__kBitConversionInts[0];
+    let mantissaHigh =
+        (JSBI.__kBitConversionInts[JSBI.__kBitConversionIntHigh] & 0xFFFFF) |
+        kHiddenBit;
+    let mantissaLow = JSBI.__kBitConversionInts[JSBI.__kBitConversionIntLow];
     const kMantissaHighTopBit = 20;
     const msdTopBit = 29 - msdLeadingZeros;
     if (msdTopBit !== (((xBitLength - 1) % 30) | 0)) {
@@ -1960,6 +1969,13 @@ class JSBI extends Array {
   static __kBitConversionBuffer = new ArrayBuffer(8);
   static __kBitConversionDouble = new Float64Array(JSBI.__kBitConversionBuffer);
   static __kBitConversionInts = new Int32Array(JSBI.__kBitConversionBuffer);
+  static __detectBigEndian() {
+    JSBI.__kBitConversionDouble[0] = -0.0;
+    return JSBI.__kBitConversionInts[0] !== 0;
+  }
+  static __kBitConversionIntHigh = JSBI.__detectBigEndian() ? 0 : 1;
+  static __kBitConversionIntLow = JSBI.__detectBigEndian() ? 1 : 0;
+
 
   // For IE11 compatibility.
   // Note that the custom replacements are tailored for JSBI's needs, and as
