@@ -131,6 +131,16 @@ const TESTS = [
   }
 })();
 
+// https://github.com/GoogleChromeLabs/jsbi/issues/101
+(function() {
+  const o = {
+    num: 123,
+    [Symbol.toPrimitive]: function() { return this.num; }
+  };
+  const result = JSBI.BigInt(o);
+  assertTrue(JSBI.equal(result, JSBI.BigInt(123)));
+})();
+
 function parse(string) {
   if (string.charCodeAt(0) === 0x2D) { // '-'
     return JSBI.unaryMinus(JSBI.BigInt(string.slice(1)));

@@ -1819,9 +1819,8 @@ class JSBI extends Array {
     if (obj.constructor === JSBI) return obj;
     if (typeof Symbol !== 'undefined' &&
           typeof Symbol.toPrimitive === 'symbol') {
-      const exoticToPrim = obj[Symbol.toPrimitive];
-      if (exoticToPrim) {
-        const primitive = exoticToPrim(hint);
+      if (obj[Symbol.toPrimitive]) {
+        const primitive = obj[Symbol.toPrimitive](hint);
         if (typeof primitive !== 'object') return primitive;
         throw new TypeError('Cannot convert object to primitive value');
       }
