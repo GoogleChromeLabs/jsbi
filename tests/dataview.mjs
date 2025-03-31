@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import JSBI from '../jsbi';
+import JSBI from '../dist/jsbi.mjs';
 
 const ab = new ArrayBuffer(16);
 const dv = new DataView(ab, 0, 8);
@@ -47,7 +47,7 @@ function dump(dataview) {
 
 function error(what, value, littleEndian, expected, actual) {
   throw new Error(`Incorrect ${what} for ${value}, littleEndian=${
-      littleEndian}: expected ${expected} but got ${actual}`);
+    littleEndian}: expected ${expected} but got ${actual}`);
 }
 
 function test(value) {
