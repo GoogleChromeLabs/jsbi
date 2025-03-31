@@ -1921,8 +1921,8 @@ class JSBI extends Array {
   __setHalfDigit(i: number, value: number): void {
     const digitIndex = i >>> 1;
     const previous = this.__digit(digitIndex);
-    const updated = (i & 1) ? (previous & 0x7FFF) | (value << 15)
-                            : (previous & 0x3FFF8000) | (value & 0x7FFF);
+    const updated = (i & 1) ? (previous & 0x7FFF) | (value << 15) :
+                            (previous & 0x3FFF8000) | (value & 0x7FFF);
     this.__setDigit(digitIndex, updated);
   }
 
