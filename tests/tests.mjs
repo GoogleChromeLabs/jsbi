@@ -11,8 +11,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import JSBI from '../jsbi';
-import { assertEqual, assertTrue } from './assert';
+/* eslint-disable max-len */
+import JSBI from '../dist/jsbi.mjs';
+import {assertEqual, assertTrue} from './assert.mjs';
 
 {
   // Test the example from the README.
@@ -51,7 +52,7 @@ import { assertEqual, assertTrue } from './assert';
   // Emulate an environment that doesn't have Symbol (e.g. IE11)
   // and make sure we can still coerce to primitive values.
   // See #74.
- const globalSymbol = globalThis.Symbol;
+  const globalSymbol = globalThis.Symbol;
   try {
     globalThis.Symbol = undefined;
     assertTrue(JSBI.EQ(JSBI.BigInt(0x7FFFFFFF), {
@@ -104,7 +105,7 @@ const TESTS = [
     b: '-0b1111111111111111111111111111111111111111111111111111111111111111',
     expected: '-0b1111111111111111111111111111111111111111111111111111111111111111',
   },
-  {  // https://github.com/GoogleChromeLabs/jsbi/issues/57
+  { // https://github.com/GoogleChromeLabs/jsbi/issues/57
     operation: 'signedRightShift',
     a: '-0xFFFFFFFFFFFFFFFF',
     b: '32',
@@ -116,7 +117,7 @@ const TESTS = [
 (function() {
   const VALID = ['123', ' 123 ', '   123   '];
   const INVALID = ['x123', 'x 123', ' 123x', '123 x', '123  xx', '123 ?a',
-                   '-0o0', '-0x0', '-0b0', '-0x1'];
+    '-0o0', '-0x0', '-0b0', '-0x1'];
   for (const v of VALID) {
     const result = JSBI.BigInt(v);
     assertTrue(JSBI.equal(result, JSBI.BigInt(123)));
@@ -124,7 +125,7 @@ const TESTS = [
   for (const i of INVALID) {
     try {
       const result = JSBI.BigInt(i);
-      throw "unreachable";
+      throw 'unreachable';
     } catch (exception) {
       assertTrue(exception instanceof SyntaxError);
     }
@@ -135,7 +136,9 @@ const TESTS = [
 (function() {
   const o = {
     num: 123,
-    [Symbol.toPrimitive]: function() { return this.num; }
+    [Symbol.toPrimitive]: function() {
+      return this.num;
+    },
   };
   const result = JSBI.BigInt(o);
   assertTrue(JSBI.equal(result, JSBI.BigInt(123)));
@@ -162,12 +165,12 @@ for (const test of TESTS) {
   const expected = parse(test.expected);
   const result = JSBI[operation](a, b);
   assertTrue(
-    JSBI.equal(result, expected),
-    `
+      JSBI.equal(result, expected),
+      `
       Unexpected result.
       ${ hex(a) } ${ operation } ${ hex(b) }
       Expected: ${ hex(expected) }
       Actual:   ${ hex(result) }
-    `.trim().replace(/\t/g, '')
+    `.trim().replace(/\t/g, ''),
   );
 }
