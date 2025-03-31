@@ -64,7 +64,7 @@ TEST_LICENSE_HEADER = """\
 """ % sys.argv[0]
 
 TEST_HEADER = """
-import JSBI from '%(jsbi_location)s';
+import JSBI from '../dist/jsbi.mjs';
 const JSBigInt = JSBI.BigInt;
 
 let errorCount = 0;
@@ -209,8 +209,8 @@ class TestGenerator(object):
   def EmitLicense(self):
     return TEST_LICENSE_HEADER
 
-  def EmitHeader(self, jsbi_location):
-    return TEST_HEADER % {"jsbi_location": jsbi_location}
+  def EmitHeader(self):
+    return TEST_HEADER
 
   def EmitFooter(self, reps):
     return TEST_FOOTER % {"reps_big": reps,
@@ -243,21 +243,21 @@ class TestGenerator(object):
   def PrintTest(self, count):
     print(self.EmitLicense())
     print(self.EmitData(count))
-    print(self.EmitHeader("../jsbi"))
+    print(self.EmitHeader())
     print(self.EmitTestBodyNative())
     print(self.EmitTestBodyJSBI())
     print(self.EmitFooter(self.GetReps()))
 
   def RunTest(self, count, binary):
     jsbi_location = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-        "jsbi.mjs")
+        os.path.dirname(os.path.abspath(__file__)),
+        "dist/jsbi.mjs")
     reps = 3  # A few iterations are enough for correctness testing.
     try:
       fd, path = tempfile.mkstemp(suffix=".mjs", prefix="bigint-test-")
       with open(path, "w") as f:
         f.write(self.EmitData(count))
-        f.write(self.EmitHeader(jsbi_location))
+        f.write(self.EmitHeader())
         f.write(self.EmitTestBodyJSBI())
         # Just turn native testing into a no-op.
         f.write("function testNative(data, reps) { return 'disabled'; }");
@@ -274,7 +274,7 @@ class UnaryOp(TestGenerator):
 
   # Subclasses may override this:
   def GenerateInput(self, line_length):
-    min_length = 0 if line_length != kLineLengthBig else line_length / 2;
+    min_length = 0 if line_length != kLineLengthBig else int(line_length / 2);
     return GenRandom(random.randint(min_length, line_length))
 
   def GetReps(self): return 40000
@@ -285,7 +285,7 @@ class UnaryOp(TestGenerator):
     x_num = Parse(x_str)
     result_num = self.GenerateResult(x_num)
     result_str = Format(result_num)
-    return "{\n  a: %s,\n  r: %s\n}" % (x_str, result_str)
+    return "{\n  a: %s,\n  r: %s,\n}" % (x_str, result_str)
 
   def GetInputPrinter(self):
     return INPUT_PRINTER_UNARY
@@ -304,7 +304,7 @@ class BinaryOp(TestGenerator):
 
   # Subclasses may override these:
   def GenerateInputLengths(self, line_length):
-    min_length = 0 if line_length != kLineLengthBig else line_length / 2;
+    min_length = 0 if line_length != kLineLengthBig else int(line_length / 2);
     return (random.randint(min_length, line_length),
             random.randint(min_length, line_length))
 
@@ -321,7 +321,7 @@ class BinaryOp(TestGenerator):
     right_num = Parse(right_str)
     result_num = self.GenerateResult(left_num, right_num)
     result_str = Format(result_num)
-    return ("{\n  a: %s,\n  b: %s,\n  r: %s\n}" %
+    return ("{\n  a: %s,\n  b: %s,\n  r: %s,\n}" %
             (left_str, right_str, result_str))
 
   def GetInputPrinter(self):
